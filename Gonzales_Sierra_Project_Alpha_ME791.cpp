@@ -73,8 +73,9 @@ double MAB::Pull() { //creates normal distribution, weighted random number
 void Q_learner::Decide(vector<MAB> M) {
 	double N;
 	//for loop with some if shit to determine if we want to do best value or random pull
-	int j = 0;
+	int j;
 	for (int i = 0; i < num_plays; i++) { //Exploration vs Exploitation
+		j = 0;
 		double b = ((double)rand() / RAND_MAX);
 		if (epsilon <= b) {
 			// pulls randomly
@@ -104,16 +105,11 @@ void MAB::Randomize() {
 };
 
 void Q_learner::Initialize() {
-	val = 0; // initializes each arm value as zero
+	for (int i = 0; i < num_arms; i++) {
+		val.push_back(0); // initializes each arm value as zero
+	}
 	alpha = 0.1;
 }
-
-
-
-
-
-
-
 
 
 void TestA() {
@@ -130,11 +126,16 @@ void TestB() {
 int main()
 {
 	srand(time(NULL));
+
+	//make MABs
+	//Make Q_learner
 	Randomize(); // picks numbers for normal distribution
+	Initialize();
 	
 
-
-	}
+	//Call decide
+	//export data
+	//make sure MAB is a list
 	
 
 	
