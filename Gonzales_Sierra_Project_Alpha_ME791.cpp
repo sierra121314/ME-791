@@ -29,18 +29,18 @@ public:
 	//randomly drawn mu and sigma values
 	double mu; //mean
 	double sigma; //standard deviation
-		
-	void Randomize(); //creates a random mu and sigm
+	
+	MAB(); //creates a random mu and sigm //constructor
 	double Pull(); //generate a number if you pull it
 	
 	};
 
 class Q_learner {
 public:
+	Q_learner(); //constructor
 	double alpha;
 	vector<double> val; //value of each pull for an arm
 	double epsilon;  //greedy value
-	void Initialize();
 	void Decide(vector<MAB>);
 	
 	
@@ -92,6 +92,7 @@ void Q_learner::Decide(vector<MAB> M) {
 				}
 			}
 		}
+
 		N = M[j].Pull(); //pulls the decided arm
 		val[j] = N*alpha + val[j]*(1 - alpha); //new value plus old val //updates value
 	}
@@ -99,12 +100,12 @@ void Q_learner::Decide(vector<MAB> M) {
 }
 
 
-void MAB::Randomize() {
+MAB::MAB() {
 	mu = (((double)rand() / RAND_MAX) - 0.5) * 50; //mean somewhere between -25 and 25
 	sigma = (((double)rand() / RAND_MAX) - 0.5) * 2;
 };
 
-void Q_learner::Initialize() {
+Q_learner::Q_learner(){
 	for (int i = 0; i < num_arms; i++) {
 		val.push_back(0); // initializes each arm value as zero
 	}
@@ -114,8 +115,10 @@ void Q_learner::Initialize() {
 
 void TestA() {
 	//The average of many pulls from a single arm converges to that arm's mu value
+	//for //all the values
+		//take the mean
 
-
+	//if //the mean is within a certain range of mu assert something
 };
 
 void TestB() {
@@ -126,14 +129,14 @@ void TestB() {
 int main()
 {
 	srand(time(NULL));
-
 	//make MABs
 	//Make Q_learner
-	Randomize(); // picks numbers for normal distribution
-	Initialize();
+	MAB Multi_arm(); // picks numbers for normal distribution
+	Q_learner Q();
 	
 
 	//Call decide
+	Decide();
 	//export data
 	//make sure MAB is a list
 	
