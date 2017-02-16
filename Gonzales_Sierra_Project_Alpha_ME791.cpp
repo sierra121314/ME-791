@@ -41,7 +41,7 @@ public:
 	double alpha;
 	vector<double> val; //value of each pull for an arm
 	void Decide(vector<MAB>, ofstream& fout);
-	void TestB(vector<MAB>);
+	void TestB(vector<MAB> M, vector<int> count);
 	void Learning_Curve(vector<MAB>);
 };
 
@@ -71,6 +71,10 @@ double MAB::Pull() { //creates normal distribution, weighted random number
 
 void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clouse and Honi Ahmadiam-Tehrani
 	double N;
+	vector<int> count;
+	for (int c = 0; c < num_arms; c++) {
+		count.push_back(0);
+	}
 	//for loop with some if sh** to determine if we want to do best value or random pull
 	int j;
 	//export data
@@ -95,12 +99,14 @@ void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clous
 		}
 		N = M[j].Pull(); //pulls the decided arm
 		val[j] = N*alpha + val[j]*(1 - alpha); //new value plus old val //updates value
+		count[j] = count[j]++; //this counts how many times each arm has been pulled...thanks Honi A.
 		for (int i = 0; i < num_arms; i++) {
 			fout << i << "," << val[i] << "\n";
 		}
+
 	}
-	//fout.close();
-	
+	//Call Test B function
+	TestB(M, count);
 }
 
 
@@ -156,52 +162,36 @@ void TestA() {
 	cout << R << "\n";
 	
 	assert(abs(R) < 1.05*abs(H.mu) && abs(R) > 0.95*abs(H.mu));
-	
+	cout << "Test A Passed" << "\n";
 	fout.close();
 	//if //the mean is within a certain range of mu assert something
 
 }
 
 
-void Q_learner::TestB(vector<MAB> M) {
+void Q_learner::TestB(vector<MAB> M, vector<int> count) {
 	//When one arge has mu and sigm values that make it clearly the best choice,
 	//the action value learner will have the highest likelihood of choosing this arm after many pulls
-	double N;
-	//for loop with some if sh** to determine if we want to do best value or random pull
-	int j;
-	//export data
-	ofstream fout;
-	fout.open("value_log.csv", ofstream::out | ofstream::trunc);
-	fout << "Rewards per play" << "\n";
-	for (int i = 0; i < num_plays; i++) { //Exploration vs Exploitation
-		j = 0;
-		double b = ((double)rand() / RAND_MAX);
-		if (epsilon <= b) {
-			// pulls randomly
-			// chooses an arm at random that fits within the number of arms
-			j = rand() % num_arms;
 
-		}
-		else {
-			//try to find which arm has the highest reward
+	// Takes the arm with the highest count of pulls, takes its mean and std dev
+	// Then compares those values to the values of all the other arms
+	// If the arm with the highest pulls has the largest mean then assert
+	int j = 0;
 
-			for (int k = 0; k < num_arms; k++) {
-				if (val[j] < val[k]) {
-					j = k; //updates the value at j so that equals the highest value at k
-				}
-			}
-
-
-		}
-
-		N = M[j].Pull(); //pulls the decided arm
-		val[j] = N*alpha + val[j] * (1 - alpha); //new value plus old val //updates value
-		for (int i = 0; i < num_arms; i++) {
-			fout << i << "," << val[i] << "\n";
+	for (int y = 0; y < num_arms; y++) {
+		if (count[j] < count[y]) {
+			j = y; //updates the value at j so that equals the highest value at k
 		}
 	}
-	fout.close();
-	
+	//M[j].mu;
+	int u = 0;
+	for (int h = 0; h < num_arms; h++) {
+		if (M[u].mu < M[h].mu) {
+			u = h;
+		}
+	}
+	assert(M[j].mu == M[u].mu);
+	cout << "Test B Passed" << "\n";
 
 };
 
@@ -226,10 +216,9 @@ int main()
 	//Call decide
 	//Q_learn.Decide(M ); // vector M which is the created arms, and plugs them into the Q-learner
 
-	Q_learn.Learning_Curve(M);
+	Q_learn.Learning_Curve(M); //Calls the Decide function 30 times
 	TestA();
-	Q_learn.TestB(M);
-	
+		
 	int input;
 	cin >> input;
 
