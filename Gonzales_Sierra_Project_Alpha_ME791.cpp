@@ -41,7 +41,8 @@ public:
 	double alpha;
 	vector<double> val; //value of each pull for an arm
 	void Decide(vector<MAB>);
-	
+	void TestB(vector<MAB>);
+	void Learning_Curve();
 };
 
 double MAB::Pull() { //creates normal distribution, weighted random number
@@ -70,7 +71,7 @@ double MAB::Pull() { //creates normal distribution, weighted random number
 
 void Q_learner::Decide(vector<MAB> M) { //Help from Bryant Clouse and Honi Ahmadiam-Tehrani
 	double N;
-	//for loop with some if shit to determine if we want to do best value or random pull
+	//for loop with some if sh** to determine if we want to do best value or random pull
 	int j;
 	//export data
 	ofstream fout;
@@ -104,6 +105,7 @@ void Q_learner::Decide(vector<MAB> M) { //Help from Bryant Clouse and Honi Ahmad
 		}
 	}
 	fout.close();
+	
 }
 
 
@@ -120,7 +122,7 @@ Q_learner::Q_learner(){ //initializer
 }
 
 
-void TestA() {
+void Q_learner::Learning_Curve() {
 	//The average of many pulls from a single arm converges to that arm's mu value
 	MAB A;
 	double x;
@@ -135,21 +137,88 @@ void TestA() {
 		R = (R*(i-1) + x) / i; // takes the old reward average and multiplies it with the last number of pulls then adds the new reward and divides by the new number of pulls
 		fout << i << "," << R << "\n";
 	}
-	cout << A.mu;
+	
 	fout.close();
-	//if //the mean is within a certain range of mu assert something
+	
 };
 
-void TestB() {
+void TestA() {
+	//The average of many pulls from a single arm converges to that arm's mu value
+	//want to see if the final value/reward is close to the mean 
+	MAB H; //Single arm
+	double x;
+	double R;
+	x = 0;
+	R = 0;
+	H.Init();
+	ofstream fout;
+	fout.open("TestA.csv", ofstream::out | ofstream::trunc);
+	fout << "Comparing last value with mean of that arm" << "\n";
+	for (int i = 1; i < 3000; i++) { //more the better
+		x=H.Pull();
+
+		R = x*0.1 + R * (1 - 0.1);
+		fout << i << "," << R << "\n";
+	}
+	cout << "Comparing mean and Last reward"<< "\t" << H.mu << "\t";
+	cout << R << "\n";
+	
+	assert(abs(R) < 1.05*abs(H.mu) && abs(R) > 0.95*abs(H.mu));
+	
+	fout.close();
+	//if //the mean is within a certain range of mu assert something
+
+}
+
+
+void Q_learner::TestB(vector<MAB> M) {
 	//When one arge has mu and sigm values that make it clearly the best choice,
 	//the action value learner will have the highest likelihood of choosing this arm after many pulls
+	double N;
+	//for loop with some if sh** to determine if we want to do best value or random pull
+	int j;
+	//export data
+	ofstream fout;
+	fout.open("value_log.csv", ofstream::out | ofstream::trunc);
+	fout << "Rewards per play" << "\n";
+	for (int i = 0; i < num_plays; i++) { //Exploration vs Exploitation
+		j = 0;
+		double b = ((double)rand() / RAND_MAX);
+		if (epsilon <= b) {
+			// pulls randomly
+			// chooses an arm at random that fits within the number of arms
+			j = rand() % num_arms;
+
+		}
+		else {
+			//try to find which arm has the highest reward
+
+			for (int k = 0; k < num_arms; k++) {
+				if (val[j] < val[k]) {
+					j = k; //updates the value at j so that equals the highest value at k
+				}
+			}
+
+
+		}
+
+		N = M[j].Pull(); //pulls the decided arm
+		val[j] = N*alpha + val[j] * (1 - alpha); //new value plus old val //updates value
+		for (int i = 0; i < num_arms; i++) {
+			fout << i << "," << val[i] << "\n";
+		}
+	}
+	fout.close();
+	
+
 };
 
 int main()
 {
 	srand(time(NULL));
 	vector<MAB> M;
-	TestA();
+	double val;
+	
 	for (int i = 0; i < num_arms; i++) { //make MABs
 		//create arm
 		MAB arm; // picks numbers for normal distribution
@@ -165,9 +234,12 @@ int main()
 	//Call decide
 	Q_learn.Decide(M); // vector M which is the created arms, and plugs them into the Q-learner
 
-
+	Q_learn.Learning_Curve();
+	TestA();
+	Q_learn.TestB(M);
 	
-
+	int input;
+	cin >> input;
 
     return 0;
 }
