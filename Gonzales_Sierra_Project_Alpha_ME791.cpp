@@ -19,7 +19,7 @@
 using namespace std;
 
 // Global Variable
-int num_arms = 2;  //n
+int num_arms = 4;  //n
 int num_plays = 100;
 double epsilon = 0.1; //greedy value
 
@@ -40,7 +40,7 @@ public:
 	Q_learner(); //constructor
 	double alpha;
 	vector<double> val; //value of each pull for an arm
-	double Decide(vector<MAB>);
+	void Decide(vector<MAB>, ofstream& fout);
 	void TestB(vector<MAB>);
 	void Learning_Curve(vector<MAB>);
 };
@@ -69,18 +69,18 @@ double MAB::Pull() { //creates normal distribution, weighted random number
 }
 
 
-double Q_learner::Decide(vector<MAB> M) { //Help from Bryant Clouse and Honi Ahmadiam-Tehrani
+void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clouse and Honi Ahmadiam-Tehrani
 	double N;
 	//for loop with some if sh** to determine if we want to do best value or random pull
 	int j;
 	//export data
-	ofstream fout;
-	fout.open("value_log.csv", ofstream::out | ofstream::trunc);
+	//ofstream fout;
+	//fout.open("Learning_Curve.csv", ofstream::out);
 	fout << "Rewards per play" << "\n";
 	for (int i = 0; i < num_plays; i++) { //Exploration vs Exploitation
 		j = 0;
 		double b = ((double)rand() / RAND_MAX);
-		if (epsilon <= b) {
+		if (epsilon >= b) {
 			// pulls randomly
 			// chooses an arm at random that fits within the number of arms
 			j = rand() % num_arms;
@@ -99,7 +99,7 @@ double Q_learner::Decide(vector<MAB> M) { //Help from Bryant Clouse and Honi Ahm
 			fout << i << "," << val[i] << "\n";
 		}
 	}
-	fout.close();
+	//fout.close();
 	
 }
 
@@ -119,26 +119,16 @@ Q_learner::Q_learner(){ //initializer
 
 void Q_learner::Learning_Curve(vector<MAB> M) {
 	//The average of many pulls from a single arm converges to that arm's mu value
-	double x;
-	double R;
-	R = 0;
+	
 	//M.Init();
 	ofstream fout;
 	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
 	fout << "Pulls per Average Reward for 30 statitical runs" << "\n";
 	for (int j = 0; j < 30; j++) { //30 statistical runs
-		fout << "Test " << j << "\n";
-		for (int k = 1; k < num_plays; k++) {
-			
-			x = Decide(M);
-			R = R*(k - 1) + x; // takes the old reward and multiplies it with the last number of pulls then adds the new reward 
-			fout << k << "," << R << "\n";
-		}
-		fout << "\t";
-		//call decide
-		
+		fout << "Run " << j << "\n";
+		Decide(M,fout);
+		fout << "\t";	
 	}
-	
 	
 	fout.close();
 	
@@ -234,7 +224,7 @@ int main()
 	//Make Q_learner
 	Q_learner Q_learn;
 	//Call decide
-	Q_learn.Decide(M); // vector M which is the created arms, and plugs them into the Q-learner
+	//Q_learn.Decide(M ); // vector M which is the created arms, and plugs them into the Q-learner
 
 	Q_learn.Learning_Curve(M);
 	TestA();
