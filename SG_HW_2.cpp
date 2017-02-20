@@ -39,14 +39,24 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 int main()
 {
 	//User input 
-	//int mode;
-	//cout << "What mode would you like to try?   /n";
+	/*
+	int mode;
+	cout << "What mode would you like to try?   /n";
 	//http://www.cplusplus.com/forum/beginner/80005/
-//	do {
-		//cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. /n";
-			//cin >> mode;
-		//	if (mode <1 || mode >2)
-	//}
+	do {
+		cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. /n";
+			cin >> mode;
+			if (mode < 1 || mode >2)
+				cout << "Only two modes available.../n /n";
+	} while (mode < 1 || mode >2); 
+	if (mode == 1) {
+		//run Human Controlled program
+	}
+	if (mode == 2) {
+		//run Hard coded program
+	}
+	*/
+	
 	
 
 
