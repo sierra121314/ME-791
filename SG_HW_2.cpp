@@ -1,9 +1,20 @@
 // SG_HW_2.cpp : Defines the entry point for the console application.
 //
 
-#include <iostream> 
-#include <stdio.h>
 #include "stdafx.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <vector>
+#include <string>
+#include <assert.h>
+#include <random>
+#include <fstream>
+#include <numeric>
+#include <time.h>
+#include <cstdlib>
+#include <cmath>
+#include <limits>
 using namespace std;
 
 const int boundary_low_x = 0; // lower x boundary that the agent cannot be less than
@@ -101,7 +112,7 @@ int main()
 			// For South Direction
 		case 'S': // either capital or
 		case 's': // lowercase for south direction
-			if (agent_y + 1 <= boundary_high_y) {
+			if (agent_y + 1 < boundary_high_y) {
 				// Physically change Agent Position
 				agent_y++;
 			}
@@ -123,7 +134,7 @@ int main()
 
 		case 'E':
 		case 'e':
-			if (agent_x + 1 <= boundary_high_x) {
+			if (agent_x + 1 < boundary_high_x) {
 				agent_x++;
 			}
 			else {
@@ -142,5 +153,9 @@ int main()
 	printf("Congrats! You caught the Golden Snitch!  \n\n");
 	//system("pause");
 	//press any key to continue
+	int input;
+	cout << "Press any key to continue..." << "\t";
+	cin >> input;
+	//close program
 	return 0;
 }
