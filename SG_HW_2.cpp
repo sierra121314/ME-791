@@ -19,8 +19,8 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 
 	// Display the Table
 	printf("\n");
-	for (int r = 0; r < boundary_high_y + 1; r++) { // r spans the range 0 to high y boundary
-		for (int c = 0; c < boundary_high_x + 1; c++) { // c spans the range 0 to high x boundary
+	for (int r = 0; r < boundary_high_y ; r++) { // r spans the range 0 to high y boundary
+		for (int c = 0; c < boundary_high_x ; c++) { // c spans the range 0 to high x boundary
 														// when a spot in the grid is A or G
 			if (grid[r][c] == 'A' || grid[r][c] == 'G') {
 				printf("%c", grid[r][c]); // print its value at its position in the grid
