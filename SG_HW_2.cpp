@@ -66,6 +66,9 @@ int main()
 	if (mode == 2) {
 		//run Hard coded program
 	}
+	//eventually
+	//else //ie Q-learner {}
+
 	*/
 	
 	
@@ -151,11 +154,9 @@ int main()
 
 	}
 	printf("Congrats! You caught the Golden Snitch!  \n\n");
-	//system("pause");
+	
 	//press any key to continue
-	int input;
-	cout << "Press any key to continue..." << "\t";
-	cin >> input;
+	system("PAUSE");
 	//close program
 	return 0;
 }
