@@ -130,6 +130,10 @@ void grid::HumanControlled() {
 	}
 }
 
+void grid::HardCoded() {
+
+}
+
 int main()
 {
 	//User input 
@@ -161,8 +165,9 @@ int main()
 	
 
 	printf("Welcome to Quidditch");
+	grid g;
+	g.HumanControlled();
 
-	grid::HumanControlled();
 	printf("Congrats! You caught the Golden Snitch!  \n\n");
 	
 	//press any key to continue
