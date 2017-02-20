@@ -66,7 +66,7 @@ void grid::HumanControlled() {
 
 		//Display Instructions
 
-		printf("Please enter a direction you wish the Agent(A) to move: North(N), South(S), East(E), West(W)");
+		printf("Please enter a direction you wish the Agent(A) to move: North(N), South(S), East(E), West(W) \n");
 		scanf_s(" %c", &direction, 1); //Make sure to put space before %c
 									   // space makes it look like a new input
 
@@ -137,38 +137,30 @@ void grid::HardCoded() {
 int main()
 {
 	//User input 
-	/*
+	printf("Welcome to Quidditch \n\n");
+	grid g;
 	int mode;
-	cout << "What mode would you like to try?   /n";
+	cout << "What mode would you like to try?   \n";
 	//http://www.cplusplus.com/forum/beginner/80005/
 	do {
-		cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. /n";
+		cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. \n";
 			cin >> mode;
 			if (mode < 1 || mode >2)
-				cout << "Only two modes available.../n /n";
+				cout << "Only two modes available...\n\n";
 	} while (mode < 1 || mode >2); 
 	if (mode == 1) {
 		//run Human Controlled program
+		g.HumanControlled();
 	}
 	if (mode == 2) {
 		//run Hard coded program
+		g.HardCoded();
 	}
 	//eventually
 	//else //ie Q-learner {}
-
-	*/
 	
 	
-
-
-
-	
-
-	printf("Welcome to Quidditch");
-	grid g;
-	g.HumanControlled();
-
-	printf("Congrats! You caught the Golden Snitch!  \n\n");
+	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
 	//press any key to continue
 	system("PAUSE");
