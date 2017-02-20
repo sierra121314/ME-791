@@ -17,6 +17,17 @@
 #include <limits>
 using namespace std;
 
+class grid {
+public:
+	// Coordinates of agent and goal
+	int agent_x = 2;
+	int agent_y = 2;
+	int goal_x = 11;
+	int goal_y = 7;
+	void HumanControlled();
+	void HardCoded();
+};
+
 const int boundary_low_x = 0; // lower x boundary that the agent cannot be less than
 const int boundary_high_x = 13; // upper x boundary that the agent cannot be greater than
 const int boundary_low_y = 0; // lower y boundary that the agent cannot be less than
@@ -46,44 +57,8 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 	printf("\n");
 }
 
-
-int main()
-{
-	//User input 
-	/*
-	int mode;
-	cout << "What mode would you like to try?   /n";
-	//http://www.cplusplus.com/forum/beginner/80005/
-	do {
-		cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. /n";
-			cin >> mode;
-			if (mode < 1 || mode >2)
-				cout << "Only two modes available.../n /n";
-	} while (mode < 1 || mode >2); 
-	if (mode == 1) {
-		//run Human Controlled program
-	}
-	if (mode == 2) {
-		//run Hard coded program
-	}
-	//eventually
-	//else //ie Q-learner {}
-
-	*/
-	
-	
-
-
-
-	// Coordinates of agent and goal
-	int agent_x = 2;
-	int agent_y = 2;
-	int goal_x = 11;
-	int goal_y = 7;
-
+void grid::HumanControlled() {
 	char direction = 'c';
-	printf("Welcome to Quidditch");
-
 	while (agent_x != goal_x || agent_y != goal_y) {
 
 		// Display the Table
@@ -153,6 +128,41 @@ int main()
 
 
 	}
+}
+
+int main()
+{
+	//User input 
+	/*
+	int mode;
+	cout << "What mode would you like to try?   /n";
+	//http://www.cplusplus.com/forum/beginner/80005/
+	do {
+		cout << "Enter 1 for a Human Controlled gridworld or 2 for a Hard-coded grid world. /n";
+			cin >> mode;
+			if (mode < 1 || mode >2)
+				cout << "Only two modes available.../n /n";
+	} while (mode < 1 || mode >2); 
+	if (mode == 1) {
+		//run Human Controlled program
+	}
+	if (mode == 2) {
+		//run Hard coded program
+	}
+	//eventually
+	//else //ie Q-learner {}
+
+	*/
+	
+	
+
+
+
+	
+
+	printf("Welcome to Quidditch");
+
+	grid::HumanControlled();
 	printf("Congrats! You caught the Golden Snitch!  \n\n");
 	
 	//press any key to continue
