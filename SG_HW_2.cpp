@@ -122,16 +122,33 @@ void grid::HumanControlled() {
 
 		default:
 			printf("Please enter a valid direction");
-
-
 		}
-
-
 	}
 }
 
 void grid::HardCoded() {
+	// Take the agent coordinates and
+	// Move, one at a time, to get the x coordinate to match with the goal.
+	// Move to get the y coordinate to match the goal
+	while (agent_x != goal_x) {
 
+		if (agent_x > goal_x) {
+			agent_x--;
+		}
+		else {
+			agent_x++;
+		}
+		display_table(agent_x, agent_y, goal_x, goal_y);
+	}
+	while (agent_y != goal_y) {
+		if (agent_y > goal_y) {
+			agent_y--;
+		}
+		else {
+			agent_y++;
+		}
+		display_table(agent_x, agent_y, goal_x, goal_y);
+	}
 }
 
 int main()
