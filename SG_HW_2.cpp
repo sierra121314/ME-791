@@ -26,6 +26,8 @@ public:
 	int goal_y = 7;
 	void HumanControlled();
 	void HardCoded();
+	void TestB();
+	void TestC();
 };
 
 const int boundary_low_x = 0; // lower x boundary that the agent cannot be less than
@@ -61,18 +63,20 @@ void TestA() {
 	//When the agent is placed far off the gridworld, it will be bumped back onto the grid
 	//when x/y coordinates of the agent are outside of the coordinates of the grid
 	//
+
 }
 
-void TestB() {
+void grid::TestB() {
 	//Agent can be guided to the goal by a human
 	//if user chooses to do human control, after goal is reached run test?
-
+	assert(agent_x == goal_x && agent_y == goal_y);
+	cout << "Test B passes  \n\n";
 }
 
-void TestC() {
+void grid::TestC() {
 	//Agent can move to goal by rule of thumb(hard coded)
-
-
+	assert(agent_x == goal_x && agent_y == goal_y);
+	cout << "Test C passes  \n\n";
 }
 
 void grid::HumanControlled() {
@@ -187,10 +191,12 @@ int main()
 	if (mode == 1) {
 		//run Human Controlled program
 		g.HumanControlled();
+		g.TestB();
 	}
 	if (mode == 2) {
 		//run Hard coded program
 		g.HardCoded();
+		g.TestC();
 	}
 	//eventually
 	//else //ie Q-learner {}
