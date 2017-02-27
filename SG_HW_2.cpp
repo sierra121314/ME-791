@@ -20,12 +20,13 @@ using namespace std;
 class grid {
 public:
 	// Coordinates of agent and goal
-	int agent_x = 2;
-	int agent_y = 2;
+	int agent_x;
+	int agent_y;
 	int goal_x = 11;
 	int goal_y = 7;
 	void HumanControlled();
 	void HardCoded();
+	void TestA();
 	void TestB();
 	void TestC();
 };
@@ -59,23 +60,23 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 	printf("\n");
 }
 
-void TestA() {
+void grid::TestA() {
 	//When the agent is placed far off the gridworld, it will be bumped back onto the grid
 	//when x/y coordinates of the agent are outside of the coordinates of the grid
-	//
-
+	assert(agent_x <= boundary_high_x && agent_x >= boundary_low_x && agent_y <= boundary_high_y && agent_y >= boundary_low_y);
+	cout << "Test A passes  \n\n";
 }
 
 void grid::TestB() {
 	//Agent can be guided to the goal by a human
-	//if user chooses to do human control, after goal is reached run test?
-	assert(agent_x == goal_x && agent_y == goal_y);
+	//if user chooses to do human control, after goal is reached run test
+	assert(agent_x == goal_x && agent_y == goal_y); //assert if the agent coordinates do not equal the goal coordinates
 	cout << "Test B passes  \n\n";
 }
 
 void grid::TestC() {
 	//Agent can move to goal by rule of thumb(hard coded)
-	assert(agent_x == goal_x && agent_y == goal_y);
+	assert(agent_x == goal_x && agent_y == goal_y); //assert if the agent coordinates do not equal the goal coordinates
 	cout << "Test C passes  \n\n";
 }
 
@@ -175,10 +176,39 @@ void grid::HardCoded() {
 
 int main()
 {
+	grid g;
+	g.agent_x = 0; //Initialize
+	g.agent_y = 0;
 	//User input 
 	printf("Welcome to Quidditch \n\n");
-	grid g;
-	TestA();
+	//have a user input function asking where you would like to start
+	
+	int start_x;
+	cout << "Where would you like your agent to start?   \n";
+	do {
+			cout << "Enter an x-position that is less than  " << boundary_high_x << " and greater than  " << boundary_low_x << "\n";
+			cin >> start_x;
+			if (start_x > boundary_high_x || start_x < boundary_low_x)
+				cout << "Number outside range. Try again \n";
+	} while (start_x > boundary_high_x || start_x < boundary_low_x);
+	if (start_x < boundary_high_x && start_x > boundary_low_x) {
+		g.agent_x = start_x;
+	}
+	
+
+	int start_y; 
+	do {
+		cout << "Enter an y-position that is less than  " << boundary_high_y << " and greater than  " << boundary_low_y << "\n";
+		cin >> start_y;
+		if (start_y > boundary_high_y || start_y < boundary_low_y)
+			cout << "Number outside range. Try again \n";
+	} while (start_y > boundary_high_y || start_y < boundary_low_y);
+	if (start_y < boundary_high_y && start_y > boundary_low_y) {
+		g.agent_y = start_y;
+	}
+
+	g.TestA(); 
+	
 	int mode;
 	cout << "What mode would you like to try?   \n";
 	//http://www.cplusplus.com/forum/beginner/80005/
@@ -200,7 +230,6 @@ int main()
 	}
 	//eventually
 	//else //ie Q-learner {}
-	
 	
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
