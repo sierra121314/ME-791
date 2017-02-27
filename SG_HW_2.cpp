@@ -195,7 +195,6 @@ int main()
 		g.agent_x = start_x;
 	}
 	
-
 	int start_y; 
 	do {
 		cout << "Enter an y-position that is less than  " << boundary_high_y << " and greater than  " << boundary_low_y << "\n";
