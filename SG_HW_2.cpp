@@ -57,6 +57,24 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 	printf("\n");
 }
 
+void TestA() {
+	//When the agent is placed far off the gridworld, it will be bumped back onto the grid
+	//when x/y coordinates of the agent are outside of the coordinates of the grid
+	//
+}
+
+void TestB() {
+	//Agent can be guided to the goal by a human
+	//if user chooses to do human control, after goal is reached run test?
+
+}
+
+void TestC() {
+	//Agent can move to goal by rule of thumb(hard coded)
+
+
+}
+
 void grid::HumanControlled() {
 	char direction = 'c';
 	while (agent_x != goal_x || agent_y != goal_y) {
@@ -156,6 +174,7 @@ int main()
 	//User input 
 	printf("Welcome to Quidditch \n\n");
 	grid g;
+	TestA();
 	int mode;
 	cout << "What mode would you like to try?   \n";
 	//http://www.cplusplus.com/forum/beginner/80005/
