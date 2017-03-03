@@ -224,7 +224,16 @@ void grid::Q_learner() {
 }
 
 void Q_learn::learning_curve() {
-
+	//Showing average number of steps taken as a function of episode averaged over 30 statistical runs
+	ofstream fout;
+	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
+	fout << "Average Number of Steps per Episode" << "\n";
+	for (int j = 0; j < 30; j++) {
+		fout << "Run" << j << "\n";
+		//some function
+		fout << "\t";
+	}
+	fout.close();
 }
 
 int main()
