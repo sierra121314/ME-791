@@ -27,6 +27,7 @@ public:
 	void HumanControlled();
 	void HardCoded();
 	void Q_learner();
+	void Q_learner_init();
 	void TestA();
 	void TestB();
 	void TestC();
@@ -219,9 +220,29 @@ void grid::HardCoded() {
 	}
 }
 
-void grid::Q_learner() {
+struct Cell {
+	float val;
+	bool already_seen;
+};
 
+void grid::Q_learner_init() {
+	// starting position Q-value =0 and all other spots besides the goal =-1
 }
+
+void grid::Q_learner() {
+	sense(); //see what options are available around the agent
+	// take location of agent currently and look north, south, east, and west
+	// noting what is the reward in each option
+	decide(); //decide to go with a known outcome or a random outcome
+	// take the greedy option 90% of the time
+	// take random 10% of the time
+	act(); // do that action from the decide function
+	// move the agent to the spot decided in the decide function
+	react(); //move the agent, update the Q-table
+	// Q(S,a)=Q(s,a)+alpha[R+lambda*Qmax-Q]
+}
+
+
 
 void Q_learn::learning_curve() {
 	//Showing average number of steps taken as a function of episode averaged over 30 statistical runs
