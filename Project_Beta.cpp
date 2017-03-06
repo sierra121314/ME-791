@@ -37,10 +37,15 @@ public:
 
 class Q_learn {
 public:
-	int Q_val;
+	double Q_val;
 	void learning_curve(); //showing average number of steps taken as a...
-	void Q_table(vector<vector<double>>);
+	vector<vector<double>> Q_table;
+	vector<int> State;
 	void Q_learner();
+	void sense();
+	void decide();
+	void act();
+	void react();
 	void Q_learner_init();
 	//function of episode averaged over 30 statistical runs
 
@@ -118,7 +123,6 @@ void grid::TestF() {
 
 	cout << "TestF Passes \n\n";
 }
-
 
 void grid::TestG() {
 	//The agent can use a different state representation that in TestD and
@@ -221,23 +225,50 @@ void grid::HardCoded() {
 	}
 }
 
-struct Cell {
-	float val;
-	bool already_seen;
-};
-
 void Q_learn::Q_learner_init() { 
-	// Initialize Q_table values
 	// block off all states where actions are not possible (i.e. make the agent go off the board) in the Q-table
 	// Initialize all values of the Q-table to near zero
 	// Update function for Q-table
+	//int num_states = (boundary_high_x + 1)*(boundary_high_y + 1);
+	
+	for (int i = 0; i < boundary_high_x; i++) { // Makes the states and assigns a value
+		for (int j = 0; j < boundary_high_y; j++) {
+			int S;
+			S = i + j * (boundary_high_x + 1);
+			State.push_back(S);
+		}
+	}
+	
+	vector<double> Action;
+	for (int k = 0; k < size(State); k++) {
+		//if (the state is near a border) {make the action that doesn't work out, not exist or the worst reward possible}
+		for (int h = 0; h < 4; h++) {
+			Q_val = ((double)rand() / RAND_MAX);
+			Action.push_back(Q_val);
+		}
+		Q_table.push_back(Action);
+		Action.clear;
+	}
 
 	// Reward table
 	// Initialize reward table
 	// Update function for Reward table
 }
 
-void Q_learn::Q_table(vector<vector<double>>) {
+void Q_learn::sense() {// which state is the agent in?
+	//compare the coordinates of the agent with a state
+	//State[agent_x && agent_y]
+}
+
+void Q_learn::decide() {
+	//
+}
+
+void Q_learn::act() {
+
+}
+
+void Q_learn::react() {
 
 }
 
@@ -245,8 +276,6 @@ void Q_learn::Q_learner() {
 
 	// loop this stuff until goal coordinates == agent coordinates
 	sense(); //Where are we???
-	// which state is the agent in?
-	
 	decide(); //decide where to move
 	// which options are available to the agent? in that state
 	//use random number generator between 0 and 9
