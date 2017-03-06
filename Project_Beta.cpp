@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <limits>
+#include <algorithm>
 using namespace std;
 
 class grid {
@@ -40,12 +41,13 @@ public:
 class Q_learn {
 public:
 	double Q_val;
+	int Q_spot;
 	void learning_curve(); //showing average number of steps taken as a...
 	vector<vector<double>> Q_table;
 	vector<int> State;
 	void Q_learner();
-	void sense();
-	void decide();
+	int sense();
+	int decide();
 	void act();
 	void react();
 	void Q_learner_init();
@@ -269,16 +271,41 @@ void Q_learn::Q_learner_init() {
 	
 }
 
-void Q_learn::sense() {// which state is the agent in?
+int Q_learn::sense() {// which state is the agent in?
 	//compare the coordinates of the agent with a state
-	//State[agent_x && agent_y]
+	//Q_spot = State[agent_x && agent_y]
+	int m;
+	double e = *max_element(Q_table[Q_spot].begin(), Q_table[Q_spot].end()); //Help from Honi Ahmadian //Finds the largest value at a state
+	for (int j; j < 4; j++) {
+		if (Q_table[Q_spot][j] = e) {// which action is the greediest
+			m == j;
+		}
+	}
+	return m;
+
 }
 
-void Q_learn::decide() {
-	//
+int Q_learn::decide() {
+	//// which options are available to the agent? in that state
+	//use random number generator between 0 and 9
+	//if digit is zero then the process will randomly select one of the 3 actions
+	//if digit is between 1 and 9 then it will choose the greedy option
+	// associate the number generated with the action to take
+	double t;
+	int A;
+	t = ((double)rand() / RAND_MAX);
+	if (t < .1) {
+		//Do a random action in that State
+		A = rand() % 4; //choose a random action out of 4
+	}
+	else { //Do Greedy stuff
+		A = sense(); // Action equals the return m from sense()
+	}
+	return A;
 }
 
 void Q_learn::act() {
+	// move the agent to the spot decided in the decide function
 
 }
 
@@ -289,15 +316,12 @@ void Q_learn::react() {
 void Q_learn::Q_learner() {
 
 	// loop this stuff until goal coordinates == agent coordinates
+	//Q_spot =  g.agent_x + g.agent_y * (boundary_high_x + 1); 
 	sense(); //Where are we???
 	decide(); //decide where to move
-	// which options are available to the agent? in that state
-	//use random number generator between 0 and 9
-	//if digit is zero then the process will randomly select one of the 3 actions
-	//if digit is between 1 and 9 then it will choose the greedy option
-	// associate the number generated with the action to take
+	
 	act(); // do that action from the decide function
-	// move the agent to the spot decided in the decide function
+	
 	react(); //update the Q-table using the Q equation
 	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
 	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
@@ -376,8 +400,8 @@ int main()
 		g.Q_learner(); //run Q-learner
 	}
 	*/
-	g.Q_learner_init();
-	g.Q_learner();
+	Q_learner_init();
+	Q_learner();
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
