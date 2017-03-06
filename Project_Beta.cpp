@@ -24,6 +24,8 @@ public:
 	int agent_y;
 	int goal_x = 11;
 	int goal_y = 7;
+	void RewardTable();
+	vector<int> RT;
 	void HumanControlled();
 	void HardCoded();
 	void TestA();
@@ -78,6 +80,20 @@ void display_table(int agent_x, int agent_y, int goal_x, int goal_y) {
 	}
 	printf("\n");
 	printf("\n");
+}
+
+void grid::RewardTable() {
+	// Reward table
+	// Initialize reward table
+	// Update function for Reward table
+	// All spots other than goal to be equal to -1, goal = 100
+	int num_spots = (boundary_high_x + 1)*(boundary_high_y + 1);
+	for  (int i = 0; i < num_spots; i++){
+		RT.push_back(-1);
+	}
+	int R;
+	R = goal_x +  goal_y * (boundary_high_x + 1); //which state goal is at
+	RT[R] = 100; //Set goal to 100 points to Gryffindor!!!
 }
 
 void grid::TestA() {
@@ -250,9 +266,7 @@ void Q_learn::Q_learner_init() {
 		Action.clear;
 	}
 
-	// Reward table
-	// Initialize reward table
-	// Update function for Reward table
+	
 }
 
 void Q_learn::sense() {// which state is the agent in?
