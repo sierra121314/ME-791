@@ -45,11 +45,11 @@ public:
 	void learning_curve(); //showing average number of steps taken as a...
 	vector<vector<double>> Q_table;
 	vector<int> State;
-	void Q_learner();
+	void Q_learner(int agent_x, int agent_y, vector<int> RT);
 	int sense();
 	int decide();
 	void act(int agent_x, int agent_y);
-	void react(int agent_x, int agent_y);
+	void react(int agent_x, int agent_y, vector<int> RT);
 	void Q_learner_init();
 	//function of episode averaged over 30 statistical runs
 
@@ -265,7 +265,7 @@ void Q_learn::Q_learner_init() {
 			Action.push_back(Q_val);
 		}
 		Q_table.push_back(Action);
-		Action.clear;
+		Action.clear();
 	}
 
 	
@@ -273,10 +273,10 @@ void Q_learn::Q_learner_init() {
 
 int Q_learn::sense() {// which state is the agent in?
 	//compare the coordinates of the agent with a state
-	//Q_spot = State[agent_x && agent_y]
-	int m;
+	
+	int m = 0;
 	double e = *max_element(Q_table[Q_spot].begin(), Q_table[Q_spot].end()); //Help from Honi Ahmadian //Finds the largest value at a state
-	for (int j; j < 4; j++) {
+	for (int j = 0; j < 4; j++) {
 		if (Q_table[Q_spot][j] = e) {// which action is the greediest
 			m == j;
 		}
@@ -316,43 +316,44 @@ void Q_learn::act(int agent_x, int agent_y) {
 		//move right
 		agent_x = agent_x + 1;
 	}
-
 	else if (A == 2) {
 		//move down
 		agent_y = agent_y - 1;
-
 	}
 	else if (A == 3) {
 		//move up up up
 		agent_y = agent_y + 1;
-
 	}
 	else {
 		cout << "you suck" << "\n";
 	}
-
 }
 
-void Q_learn::react(int agent_x, int agent_y) {
+void Q_learn::react(int agent_x, int agent_y, vector<int> RT) {
 	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
 	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
 	//which state we are in now with new placeholder
 	int placeholder;
+	int Action = decide();
 	placeholder = agent_x + agent_y * (boundary_high_x + 1);
+	double Max_action_val = *max_element(Q_table[placeholder].begin(), Q_table[placeholder].end());
+	double alpha = 0.1;
+	double gamma = 0.9;
 	// equation stuff
-
+	Q_table[Q_spot][Action] = Q_table[Q_spot][Action] + alpha*(RT[placeholder] + gamma*Max_action_val - Q_table[Q_spot][Action]);
 	//Q_spot = placeholder
+	Q_spot = placeholder;
 
 }
 
-void Q_learn::Q_learner() {
-
+void Q_learn::Q_learner(int agent_x, int agent_y, vector<int> RT) {
+	Q_spot = State[agent_x && agent_y];
 	// loop this stuff until goal coordinates == agent coordinates
 	//Q_spot =  g.agent_x + g.agent_y * (boundary_high_x + 1); 
 	//sense(); //Where are we??? //being called by decide
 	//decide(); //decide where to move //being called by act
-	act(); // do that action from the decide function
-	react(); //update the Q-table using the Q equation
+	act(agent_x, agent_y); // do that action from the decide function
+	react(agent_x, agent_y, RT); //update the Q-table using the Q equation
 	}
 
 
@@ -428,8 +429,9 @@ int main()
 		g.Q_learner(); //run Q-learner
 	}
 	*/
-	Q_learner_init();
-	Q_learner();
+	Q_learn QL;
+	QL.Q_learner_init();
+	QL.Q_learner(g.agent_x, g.agent_y, g.RT);
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
