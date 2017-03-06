@@ -26,8 +26,6 @@ public:
 	int goal_y = 7;
 	void HumanControlled();
 	void HardCoded();
-	void Q_learner();
-	void Q_learner_init();
 	void TestA();
 	void TestB();
 	void TestC();
@@ -41,6 +39,9 @@ class Q_learn {
 public:
 	int Q_val;
 	void learning_curve(); //showing average number of steps taken as a...
+	void Q_table(vector<vector<double>>);
+	void Q_learner();
+	void Q_learner_init();
 	//function of episode averaged over 30 statistical runs
 
 };
@@ -225,21 +226,38 @@ struct Cell {
 	bool already_seen;
 };
 
-void grid::Q_learner_init() {
-	// starting position Q-value =0 and all other spots besides the goal =-1
+void Q_learn::Q_learner_init() { 
+	// Initialize Q_table values
+	// block off all states where actions are not possible (i.e. make the agent go off the board) in the Q-table
+	// Initialize all values of the Q-table to near zero
+	// Update function for Q-table
+
+	// Reward table
+	// Initialize reward table
+	// Update function for Reward table
 }
 
-void grid::Q_learner() {
-	sense(); //see what options are available around the agent
-	// take location of agent currently and look north, south, east, and west
-	// noting what is the reward in each option
-	decide(); //decide to go with a known outcome or a random outcome
-	// take the greedy option 90% of the time
-	// take random 10% of the time
+void Q_learn::Q_table(vector<vector<double>>) {
+
+}
+
+void Q_learn::Q_learner() {
+
+	// loop this stuff until goal coordinates == agent coordinates
+	sense(); //Where are we???
+	// which state is the agent in?
+	
+	decide(); //decide where to move
+	// which options are available to the agent? in that state
+	//use random number generator between 0 and 9
+	//if digit is zero then the process will randomly select one of the 3 actions
+	//if digit is between 1 and 9 then it will choose the greedy option
+	// associate the number generated with the action to take
 	act(); // do that action from the decide function
 	// move the agent to the spot decided in the decide function
-	react(); //move the agent, update the Q-table
-	// Q(S,a)=Q(s,a)+alpha[R+lambda*Qmax-Q]
+	react(); //update the Q-table using the Q equation
+	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
+	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
 }
 
 
@@ -315,7 +333,7 @@ int main()
 		g.Q_learner(); //run Q-learner
 	}
 	*/
-
+	g.Q_learner_init();
 	g.Q_learner();
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
