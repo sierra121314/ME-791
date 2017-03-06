@@ -48,7 +48,7 @@ public:
 	void Q_learner();
 	int sense();
 	int decide();
-	void act();
+	void act(int agent_x, int agent_y);
 	void react();
 	void Q_learner_init();
 	//function of episode averaged over 30 statistical runs
@@ -287,9 +287,9 @@ int Q_learn::sense() {// which state is the agent in?
 
 int Q_learn::decide() {
 	//// which options are available to the agent? in that state
-	//use random number generator between 0 and 9
+	//use random number generator between 0 and .9
 	//if digit is zero then the process will randomly select one of the 3 actions
-	//if digit is between 1 and 9 then it will choose the greedy option
+	//if digit is between .1 and .9 then it will choose the greedy option
 	// associate the number generated with the action to take
 	double t;
 	int A;
@@ -304,12 +304,38 @@ int Q_learn::decide() {
 	return A;
 }
 
-void Q_learn::act() {
+void Q_learn::act(int agent_x, int agent_y) {
 	// move the agent to the spot decided in the decide function
+	int A;
+	A = decide();
+	if (A == 0) {
+		//to the left, to the left
+		agent_x = agent_x - 1;
+	}
+	else if (A == 1) {
+		//move right
+		agent_x = agent_x + 1;
+	}
+
+	else if (A == 2) {
+		//move down
+		agent_y = agent_y - 1;
+
+	}
+	else if (A == 3) {
+		//move up up up
+		agent_y = agent_y + 1;
+
+	}
+	else {
+		cout << "you suck" << "\n";
+	}
 
 }
 
 void Q_learn::react() {
+	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
+	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
 
 }
 
@@ -317,15 +343,11 @@ void Q_learn::Q_learner() {
 
 	// loop this stuff until goal coordinates == agent coordinates
 	//Q_spot =  g.agent_x + g.agent_y * (boundary_high_x + 1); 
-	sense(); //Where are we???
-	decide(); //decide where to move
-	
+	//sense(); //Where are we??? //being called by decide
+	//decide(); //decide where to move //being called by act
 	act(); // do that action from the decide function
-	
 	react(); //update the Q-table using the Q equation
-	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
-	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
-}
+	}
 
 
 
