@@ -49,7 +49,7 @@ public:
 	int sense();
 	int decide();
 	void act(int agent_x, int agent_y);
-	void react();
+	void react(int agent_x, int agent_y);
 	void Q_learner_init();
 	//function of episode averaged over 30 statistical runs
 
@@ -333,9 +333,15 @@ void Q_learn::act(int agent_x, int agent_y) {
 
 }
 
-void Q_learn::react() {
+void Q_learn::react(int agent_x, int agent_y) {
 	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
 	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
+	//which state we are in now with new placeholder
+	int placeholder;
+	placeholder = agent_x + agent_y * (boundary_high_x + 1);
+	// equation stuff
+
+	//Q_spot = placeholder
 
 }
 
