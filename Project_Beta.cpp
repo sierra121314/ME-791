@@ -32,10 +32,10 @@ public:
 	void TestA();
 	void TestB();
 	void TestC();
-	void TestE(int start_x, int start_y);
+	
 	
 };
-
+void TestE(int agent_x, int agent_y, int start_x, int start_y);
 class Q_learn {
 public:
 	double Q_val;
@@ -125,13 +125,13 @@ void Q_learn::TestD() {
 	//cout << "TestD Passes \n\n";
 }
 
-void grid::TestE(int start_x, int start_y) {
+void TestE(int agent_x, int agent_y, int start_x, int start_y) {
 	//When the agent reaches the goal state, it is reset to the 
 	//initial state and is identical to a freshly-initialized agent,
 	//except in updated Q-values
 	//assert(agent x/y position equals the initial xy position);
 	assert(agent_x == start_x || agent_y == start_y);
-	cout << "TestE Passes \n\n";
+	//cout << "TestE Passes \n\n";
 }
 
 void Q_learn::TestF() {
@@ -383,7 +383,7 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 		int count = 0;
 		for (int ep = 0; ep < 500; ep++) { //episodes //should be converging to a smaller amount of steps
 			
-			//TestE();
+			
 			Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 			//fout  << "," << ep;
 			count = 0;
@@ -391,12 +391,15 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 			QG = goal_x + goal_y*(boundary_high_x + 1);
 			//cout << Q_spot << "\n\n";
 			// loop this stuff until goal coordinates == agent coordinates 
+			
 			while (Q_spot != QG) {
 				//sense(); //Where are we??? //being called by decide
 				//decide(); //decide where to move //being called by act
 				//act(agent_x, agent_y); // do that action from the decide function //being called by react
+				//cout << "Agent X before move: " << agent_x << endl;
 				react(agent_x, agent_y, RT); //update the Q-table using the Q equation
 											 //cout << Q_spot << "\n";
+				//cout << "Agent X after move: " << agent_x << endl;
 				count++;
 				//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
 
@@ -404,6 +407,8 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 			fout << "," << count;
 			agent_x = start_x;
 			agent_y = start_y;
+			TestE(agent_x, agent_y, start_x, start_y);
+			//cout << "agent x after reset: " << agent_x << endl;
 			count = 0;
 			/*
 			for (int s = 0; s < size(State); s++) {
