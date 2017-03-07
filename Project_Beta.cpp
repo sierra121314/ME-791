@@ -42,11 +42,11 @@ public:
 	void learning_curve(); //showing average number of steps taken as a...
 	vector<vector<double>> Q_table;
 	vector<int> State;
-	void Q_learner(int agent_x, int agent_y, vector<int> RT, int goal_x, int goal_y);
+	void Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y);
 	int sense();
 	int decide();
-	int act(int agent_x, int agent_y);
-	void react(int agent_x, int agent_y, vector<int> RT);
+	int act(int &agent_x, int &agent_y);
+	void react(int &agent_x, int &agent_y, vector<int> &RT);
 	void Q_learner_init();
 	void TestD();
 	void TestE();
@@ -302,25 +302,45 @@ int Q_learn::decide() {
 	return A;
 }
 
-int Q_learn::act(int agent_x, int agent_y) {
+int Q_learn::act(int &agent_x, int &agent_y) {
 	// move the agent to the spot decided in the decide function
 	int A;
 	A = decide();
 	if (A == 0) {
 		//to the left, to the left
-		agent_x = agent_x - 1;
+		if (agent_x - 1 >= boundary_low_x) {
+			agent_x = agent_x - 1;
+		}
+		else {
+			agent_x = agent_x;
+		}
 	}
 	else if (A == 1) {
 		//move right
-		agent_x = agent_x + 1;
+		if (agent_x + 1 < boundary_high_x) {
+			agent_x = agent_x + 1;
+		}
+		else {
+			agent_x = agent_x;
+		}
 	}
 	else if (A == 2) {
 		//move down
-		agent_y = agent_y - 1;
+		if (agent_y - 1 >= boundary_low_y) {
+			agent_y = agent_y - 1;
+		}
+		else {
+			agent_y = agent_y;
+		}
 	}
 	else if (A == 3) {
 		//move up up up
-		agent_y = agent_y + 1;
+		if (agent_y + 1 < boundary_high_y) {
+			agent_y = agent_y + 1;
+		}
+		else {
+			agent_y = agent_y;
+		}
 	}
 	else {
 		cout << "you suck" << "\n";
@@ -328,7 +348,7 @@ int Q_learn::act(int agent_x, int agent_y) {
 	return A;
 }
 
-void Q_learn::react(int agent_x, int agent_y, vector<int> RT) {
+void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
 	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
 	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
 	//which state we are in now with new placeholder
@@ -336,6 +356,7 @@ void Q_learn::react(int agent_x, int agent_y, vector<int> RT) {
 	cout << agent_x << ", " << agent_y << "\n";
 	int Action = act(agent_x, agent_y);
 	cout << agent_x << ", " << agent_y << "\n";
+	
 	placeholder = agent_x + agent_y * (boundary_high_x + 1);
 	double Max_action_val = *max_element(Q_table[placeholder].begin(), Q_table[placeholder].end());
 	double alpha = 0.1;
@@ -347,7 +368,7 @@ void Q_learn::react(int agent_x, int agent_y, vector<int> RT) {
 
 }
 
-void Q_learn::Q_learner(int agent_x, int agent_y, vector<int> RT, int goal_x, int goal_y) {
+void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y) {
 	Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 	int QG;
 	QG = goal_x + goal_y*(boundary_high_x + 1);
