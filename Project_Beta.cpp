@@ -32,6 +32,7 @@ public:
 	void TestA();
 	void TestB();
 	void TestC();
+	void TestE(int start_x, int start_y);
 	
 };
 
@@ -49,7 +50,7 @@ public:
 	void react(int &agent_x, int &agent_y, vector<int> &RT);
 	void Q_learner_init();
 	void TestD();
-	void TestE();
+	
 	void TestF();
 	void TestG();
 	//function of episode averaged over 30 statistical runs
@@ -121,15 +122,16 @@ void grid::TestC() {
 
 void Q_learn::TestD() {
 	//No Q-value ever exceeds the reward given by reaching the goal state
-	assert(Q_val < 100);
-	cout << "TestD Passes \n\n";
+	assert(Q_val < 101);
+	//cout << "TestD Passes \n\n";
 }
 
-void Q_learn::TestE() {
+void grid::TestE(int start_x, int start_y) {
 	//When the agent reaches the goal state, it is reset to the 
 	//initial state and is identical to a freshly-initialized agent,
 	//except in updated Q-values
 	//assert(agent x/y position equals the initial xy position);
+	assert(agent_x == start_x || agent_y == start_y);
 	cout << "TestE Passes \n\n";
 }
 
@@ -366,6 +368,7 @@ void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
 	// equation stuff
 	Q_table[Q_spot][Action] = Q_table[Q_spot][Action] + alpha*(RT[placeholder] + gamma*Max_action_val - Q_table[Q_spot][Action]);
 	//Q_spot = placeholder
+	TestD();//checks to see if the Q_values are greater than 101;
 	Q_spot = placeholder;
 
 }
@@ -485,8 +488,13 @@ int main()
 	}
 	*/
 	Q_learn QL;
-	QL.Q_learner_init();
-	QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
+	for (int y = 0; y < 30; y++) {
+		QL.Q_learner_init();
+		QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
+
+	
+	}
+	
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
