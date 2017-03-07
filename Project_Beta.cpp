@@ -32,10 +32,7 @@ public:
 	void TestA();
 	void TestB();
 	void TestC();
-	void TestD();
-	void TestE();
-	void TestF();
-	void TestG();
+	
 };
 
 class Q_learn {
@@ -51,6 +48,10 @@ public:
 	void act(int agent_x, int agent_y);
 	void react(int agent_x, int agent_y, vector<int> RT);
 	void Q_learner_init();
+	void TestD();
+	void TestE();
+	void TestF();
+	void TestG();
 	//function of episode averaged over 30 statistical runs
 
 };
@@ -118,15 +119,13 @@ void grid::TestC() {
 	cout << "Test C passes  \n\n";
 }
 
-void grid::TestD() {
+void Q_learn::TestD() {
 	//No Q-value ever exceeds the reward given by reaching the goal state
-	//assert(Q_val > 100);
-
+	assert(Q_val < 100);
 	cout << "TestD Passes \n\n";
-
 }
 
-void grid::TestE() {
+void Q_learn::TestE() {
 	//When the agent reaches the goal state, it is reset to the 
 	//initial state and is identical to a freshly-initialized agent,
 	//except in updated Q-values
@@ -134,7 +133,7 @@ void grid::TestE() {
 	cout << "TestE Passes \n\n";
 }
 
-void grid::TestF() {
+void Q_learn::TestF() {
 	//The agent is capable of using Q-learning to get to the goal in near optimal number of steps
 	//take the lowest amount of steps out of all step recordings and compare with the last recording
 	//if within a certain range - TestF passes
@@ -142,7 +141,7 @@ void grid::TestF() {
 	cout << "TestF Passes \n\n";
 }
 
-void grid::TestG() {
+void Q_learn::TestG() {
 	//The agent can use a different state representation that in TestD and
 	//get to the goal state
 	//Could reference its starting point and each represent each grid it is in as a number
@@ -249,8 +248,8 @@ void Q_learn::Q_learner_init() {
 	// Update function for Q-table
 	//int num_states = (boundary_high_x + 1)*(boundary_high_y + 1);
 	
-	for (int i = 0; i < boundary_high_x; i++) { // Makes the states and assigns a value
-		for (int j = 0; j < boundary_high_y; j++) {
+	for (int i = 0; i < boundary_high_x+1; i++) { // Makes the states and assigns a value
+		for (int j = 0; j < boundary_high_y+1; j++) {
 			int S;
 			S = i + j * (boundary_high_x + 1);
 			State.push_back(S);
@@ -262,13 +261,13 @@ void Q_learn::Q_learner_init() {
 		//if (the state is near a border) {make the action that doesn't work out, not exist or the worst reward possible}
 		for (int h = 0; h < 4; h++) {
 			Q_val = ((double)rand() / RAND_MAX);
+			cout << Q_val << "\n";
 			Action.push_back(Q_val);
+			
 		}
 		Q_table.push_back(Action);
 		Action.clear();
 	}
-
-	
 }
 
 int Q_learn::sense() {// which state is the agent in?
@@ -278,11 +277,10 @@ int Q_learn::sense() {// which state is the agent in?
 	double e = *max_element(Q_table[Q_spot].begin(), Q_table[Q_spot].end()); //Help from Honi Ahmadian //Finds the largest value at a state
 	for (int j = 0; j < 4; j++) {
 		if (Q_table[Q_spot][j] = e) {// which action is the greediest
-			m == j;
+			m = j;
 		}
 	}
 	return m;
-
 }
 
 int Q_learn::decide() {
@@ -347,7 +345,7 @@ void Q_learn::react(int agent_x, int agent_y, vector<int> RT) {
 }
 
 void Q_learn::Q_learner(int agent_x, int agent_y, vector<int> RT) {
-	Q_spot = State[agent_x && agent_y];
+	Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 	// loop this stuff until goal coordinates == agent coordinates
 	//Q_spot =  g.agent_x + g.agent_y * (boundary_high_x + 1); 
 	//sense(); //Where are we??? //being called by decide
@@ -373,9 +371,11 @@ void Q_learn::learning_curve() {
 
 int main()
 {
+	srand(time(NULL));
 	grid g;
 	g.agent_x = 0; //Initialize
 	g.agent_y = 0;
+	g.RewardTable();
 	//User input 
 	printf("Welcome to Quidditch \n\n");
 	//have a user input function asking where you would like to start
