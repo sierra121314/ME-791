@@ -248,7 +248,7 @@ void Q_learn::Q_learner_init() {
 	// Initialize all values of the Q-table to near zero
 	// Update function for Q-table
 	//int num_states = (boundary_high_x + 1)*(boundary_high_y + 1);
-	
+	State.clear();
 	for (int i = 0; i < boundary_high_x+1; i++) { // Makes the states and assigns a value
 		for (int j = 0; j < boundary_high_y+1; j++) {
 			int S;
@@ -257,7 +257,8 @@ void Q_learn::Q_learner_init() {
 		}
 	}
 	
-	vector<double> Action;
+	vector<double> Action ;
+	Action.clear();
 	for (int k = 0; k < size(State); k++) {
 		//if (the state is near a border) {make the action that doesn't work out, not exist or the worst reward possible}
 		for (int h = 0; h < 4; h++) {
@@ -381,8 +382,7 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 		fout << "\nRun" << "," << R << ",";
 		int count = 0;
 		for (int ep = 0; ep < 500; ep++) { //episodes //should be converging to a smaller amount of steps
-			agent_x = start_x;
-			agent_y = start_y;
+			
 			//TestE();
 			Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 			//fout  << "," << ep;
@@ -399,13 +399,18 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 											 //cout << Q_spot << "\n";
 				count++;
 				//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
-			}
+
+			}		
 			fout << "," << count;
-			//for (int s = 0; s < size(State); s++) {
-			//for (int a = 0; a < 4; a++) {
-			//fout << "," << Q_table[s][a] << ",";
-			//}
-			//}
+			agent_x = start_x;
+			agent_y = start_y;
+			count = 0;
+			/*
+			for (int s = 0; s < size(State); s++) {
+				for (int a = 0; a < 4; a++) {
+			
+			}
+			//}*/
 
 		}
 	}
