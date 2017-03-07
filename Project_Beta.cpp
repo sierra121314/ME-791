@@ -40,7 +40,6 @@ class Q_learn {
 public:
 	double Q_val;
 	int Q_spot;
-	void learning_curve(); //showing average number of steps taken as a...
 	vector<vector<double>> Q_table;
 	vector<int> State;
 	void Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y);
@@ -375,58 +374,49 @@ void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
 
 void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_x, int &goal_y, int start_x, int start_y) {
 	ofstream fout;
-	fout.open("Q_learner_stuff.csv", ofstream::out | ofstream::trunc);
-	int count = 0;
-	for (int ep = 0; ep < 50; ep++) { //episodes //should be converging to a smaller amount of steps
-		agent_x = start_x;
-		agent_y = start_y;
-		//TestE();
-		Q_spot = agent_x + agent_y * (boundary_high_x + 1);
-		fout << "\nEpisode" << "," << ep << ",";
-		count = 0;
-		int QG;
-		QG = goal_x + goal_y*(boundary_high_x + 1);
-		//cout << Q_spot << "\n\n";
-		// loop this stuff until goal coordinates == agent coordinates 
-		while (Q_spot != QG) {
-			//sense(); //Where are we??? //being called by decide
-			//decide(); //decide where to move //being called by act
-			//act(agent_x, agent_y); // do that action from the decide function //being called by react
-			react(agent_x, agent_y, RT); //update the Q-table using the Q equation
-			//cout << Q_spot << "\n";
-			count++;
-			//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
-		}
-		fout << count << ",";
-		//for (int s = 0; s < size(State); s++) {
-			//for (int a = 0; a < 4; a++) {
-				//fout << "," << Q_table[s][a] << ",";
-			//}
-		//}
-
-	}
-	
-	
-}
-
-
-
-void Q_learn::learning_curve() {
-	//Showing average number of steps taken as a function of episode averaged over 30 statistical runs
-	//Run is 30 statastical runs
-	//episode is 50 times that i restart the Q-learning
-	
-	ofstream fout;
 	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
-	fout << "Average Number of Steps per Episode" << "\n";
-	for (int j = 0; j < 30; j++) {
-		fout << "Run" << j << "\n\t\t";
-		//some function//count how many steps
-		fout << "\t\t" << "moves" << "," << "episode" << "\n" ;
-		fout << "\t";
+
+	for (int R = 0; R < 30; R++) {
+		Q_learner_init();
+		fout << "\nRun" << "," << R << ",";
+		int count = 0;
+		for (int ep = 0; ep < 500; ep++) { //episodes //should be converging to a smaller amount of steps
+			agent_x = start_x;
+			agent_y = start_y;
+			//TestE();
+			Q_spot = agent_x + agent_y * (boundary_high_x + 1);
+			//fout  << "," << ep;
+			count = 0;
+			int QG;
+			QG = goal_x + goal_y*(boundary_high_x + 1);
+			//cout << Q_spot << "\n\n";
+			// loop this stuff until goal coordinates == agent coordinates 
+			while (Q_spot != QG) {
+				//sense(); //Where are we??? //being called by decide
+				//decide(); //decide where to move //being called by act
+				//act(agent_x, agent_y); // do that action from the decide function //being called by react
+				react(agent_x, agent_y, RT); //update the Q-table using the Q equation
+											 //cout << Q_spot << "\n";
+				count++;
+				//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
+			}
+			fout << "," << count;
+			//for (int s = 0; s < size(State); s++) {
+			//for (int a = 0; a < 4; a++) {
+			//fout << "," << Q_table[s][a] << ",";
+			//}
+			//}
+
+		}
 	}
-	fout.close();
+	
+	
+	
 }
+
+
+
+
 
 int main()
 {
@@ -489,14 +479,9 @@ int main()
 	}
 	*/
 	Q_learn QL;
-	for (int y = 0; y < 30; y++) {
-		
-		QL.Q_learner_init();
-		QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
-
 	
-	}
-	QL.learning_curve();
+	
+	QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
