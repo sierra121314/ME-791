@@ -50,7 +50,7 @@ public:
 	void Q_learner_init();
 	void TestD();
 	
-	void TestF();
+	void TestF(int start_x, int start_y, int goal_x, int goal_y, int count);
 	void TestG();
 	//function of episode averaged over 30 statistical runs
 
@@ -134,11 +134,17 @@ void TestE(int agent_x, int agent_y, int start_x, int start_y) {
 	//cout << "TestE Passes \n\n";
 }
 
-void Q_learn::TestF() {
+void Q_learn::TestF(int start_x, int start_y, int goal_x, int goal_y, int count) {
 	//The agent is capable of using Q-learning to get to the goal in near optimal number of steps
 	//take the lowest amount of steps out of all step recordings and compare with the last recording
 	//if within a certain range - TestF passes
-
+	int dx;
+	dx = abs(start_x - goal_x);
+	int dy;
+	dy = abs(start_y - goal_y);
+	int dxy;
+	dxy = dx + dy; //should be optimal steps
+	assert(dxy*.5 < count && dxy*1.5 > count);
 	cout << "TestF Passes \n\n";
 }
 
@@ -405,11 +411,12 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 
 			}		
 			fout << "," << count;
+			
 			agent_x = start_x;
 			agent_y = start_y;
 			TestE(agent_x, agent_y, start_x, start_y);
 			//cout << "agent x after reset: " << agent_x << endl;
-			count = 0;
+			
 			/*
 			for (int s = 0; s < size(State); s++) {
 				for (int a = 0; a < 4; a++) {
@@ -418,6 +425,7 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_
 			//}*/
 
 		}
+		TestF(start_x, start_y, goal_x, goal_y, count);
 	}
 	
 	
