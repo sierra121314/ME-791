@@ -373,13 +373,14 @@ void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
 
 }
 
-void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y) {
+void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT,  int &goal_x, int &goal_y, int start_x, int start_y) {
 	ofstream fout;
 	fout.open("Q_learner_stuff.csv", ofstream::out | ofstream::trunc);
 	int count = 0;
-	for (int ep = 0; ep < 100; ep++) { //episodes //should be converging to a smaller amount of steps
+	for (int ep = 0; ep < 50; ep++) { //episodes //should be converging to a smaller amount of steps
 		agent_x = start_x;
 		agent_y = start_y;
+		//TestE();
 		Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 		fout << "\nEpisode" << "," << ep << ",";
 		count = 0;
@@ -397,11 +398,11 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 			//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
 		}
 		fout << count << ",";
-		for (int s = 0; s < size(State); s++) {
-			for (int a = 0; a < 4; a++) {
-				fout << "," << Q_table[s][a] << ",";
-			}
-		}
+		//for (int s = 0; s < size(State); s++) {
+			//for (int a = 0; a < 4; a++) {
+				//fout << "," << Q_table[s][a] << ",";
+			//}
+		//}
 
 	}
 	
@@ -421,7 +422,7 @@ void Q_learn::learning_curve() {
 	for (int j = 0; j < 30; j++) {
 		fout << "Run" << j << "\n\t\t";
 		//some function//count how many steps
-		fout << "\t\t" << "run" << "episode" << "\n" ;
+		fout << "\t\t" << "moves" << "," << "episode" << "\n" ;
 		fout << "\t";
 	}
 	fout.close();
@@ -489,12 +490,13 @@ int main()
 	*/
 	Q_learn QL;
 	for (int y = 0; y < 30; y++) {
+		
 		QL.Q_learner_init();
 		QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
 
 	
 	}
-	
+	QL.learning_curve();
 
 	printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	
