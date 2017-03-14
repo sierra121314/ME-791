@@ -27,10 +27,10 @@ public:
 	int agent_y;
 	int goal_x = 11;
 	int goal_y = 7;
-	int wall_x1 = goal_x - 1;
-	int wall_y1 = goal_y;
-	int wall_x2 = goal_x;
-	int wall_y2 = goal_y - 1;
+	int wall_x1;
+	int wall_y1;
+	int wall_x2;
+	int wall_y2;
 	void RewardTable();
 	vector<int> RT;
 	void HumanControlled();
@@ -49,11 +49,11 @@ public:
 	int Q_spot;
 	vector<vector<double>> Q_table;
 	vector<int> State;
-	void Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y);
+	void Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y, int wall_x1, int wall_y1, int wall_x2, int wall_y2);
 	int sense();
 	int decide();
-	int act(int &agent_x, int &agent_y);
-	void react(int &agent_x, int &agent_y, vector<int> &RT);
+	int act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_x2, int wall_y2);
+	void react(int &agent_x, int &agent_y, vector<int> &RT, int wall_x1, int wall_y1, int wall_x2, int wall_y2);
 	void Q_learner_init();
 	void TestD();
 	void Q_learner_SR(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y);
@@ -290,6 +290,7 @@ void grid::HardCoded() {
 	if (agent_x == goal_x && agent_y==goal_y) {
 		printf("\nCongrats! You caught the Golden Snitch!  \n\n");
 	}
+	//assert(agent_x != goal_x);
 }
 
 void Q_learn::Q_learner_init() {
@@ -355,44 +356,84 @@ int Q_learn::decide() {
 	return A;
 }
 
-int Q_learn::act(int &agent_x, int &agent_y) {
+int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_x2, int wall_y2) {
 	// move the agent to the spot decided in the decide function
 	int A;
 	A = decide();
 	if (A == 0) {
 		//to the left, to the left
 		if (agent_x - 1 >= boundary_low_x) {
-			agent_x = agent_x - 1;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_x = agent_x - 1;
+			}
 		}
 		else {
-			agent_x = agent_x;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_x = agent_x;
+			}
 		}
 	}
 	else if (A == 1) {
 		//move right
 		if (agent_x + 1 < boundary_high_x) {
-			agent_x = agent_x + 1;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_x = agent_x + 1;
+			}
 		}
 		else {
-			agent_x = agent_x;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_x = agent_x;
+			}
 		}
 	}
 	else if (A == 2) {
 		//move down
 		if (agent_y - 1 >= boundary_low_y) {
-			agent_y = agent_y - 1;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_y = agent_y - 1;
+			}
 		}
 		else {
-			agent_y = agent_y;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_y = agent_y;
+			}
 		}
 	}
 	else if (A == 3) {
 		//move up up up
 		if (agent_y + 1 < boundary_high_y) {
-			agent_y = agent_y + 1;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_y = agent_y + 1;
+			}
 		}
 		else {
-			agent_y = agent_y;
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+				//nothing
+			}
+			else {
+				agent_y = agent_y;
+			}
 		}
 	}
 	else {
@@ -401,13 +442,13 @@ int Q_learn::act(int &agent_x, int &agent_y) {
 	return A;
 }
 
-void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
+void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT, int wall_x1, int wall_y1, int wall_x2, int wall_y2) {
 	// Q(S,a)=Q(s,a)+alpha[R+gamma*Qmax-Q]
 	//new = old + alpha[Reward_from_next_state + gamma*Max_action_val_from_next_state - old]
 	//which state we are in now with new placeholder
 	int placeholder;
 	//cout << agent_x << ", " << agent_y << "\n";
-	int Action = act(agent_x, agent_y);
+	int Action = act(agent_x, agent_y, wall_x1, wall_y1, wall_x2, wall_y2);
 	//cout << agent_x << ", " << agent_y << "\n";
 
 	placeholder = agent_x + agent_y * (boundary_high_x + 1);
@@ -422,7 +463,7 @@ void Q_learn::react(int &agent_x, int &agent_y, vector<int> &RT) {
 
 }
 
-void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y) {
+void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y, int wall_x1, int wall_y1, int wall_x2, int wall_y2) {
 	ofstream fout;
 	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
 
@@ -444,7 +485,7 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 				//decide(); //decide where to move //being called by act
 				//act(agent_x, agent_y); // do that action from the decide function //being called by react
 				//cout << "Agent X before move: " << agent_x << endl;
-				react(agent_x, agent_y, RT); //update the Q-table using the Q equation
+				react(agent_x, agent_y, RT, wall_x1, wall_y1, wall_x2, wall_y2); //update the Q-table using the Q equation
 											 //cout << Q_spot << "\n";
 											 //cout << "Agent X after move: " << agent_x << endl;
 				count++;
@@ -474,91 +515,6 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 	}
 
 }
-//Not DONE
-void Q_learn::Q_learner_init_SR() {
-	// block off all states where actions are not possible (i.e. make the agent go off the board) in the Q-table
-	// Initialize all values of the Q-table to near zero
-	// Update function for Q-table
-	//int num_states = (boundary_high_x + 1)*(boundary_high_y + 1);
-	State.clear();
-	for (int i = 0; i < boundary_high_x + 1; i++) { // Makes the states and assigns a value
-		for (int j = 0; j < boundary_high_y + 1; j++) {
-			int S;
-			S = i + j * (boundary_high_x + 1);
-			State.push_back(S);
-		}
-	}
-
-	vector<double> Action;
-	Action.clear();
-	for (int k = 0; k < size(State); k++) {
-		//if (the state is near a border) {make the action that doesn't work out, not exist or the worst reward possible}
-		for (int h = 0; h < 4; h++) {
-			Q_val = ((double)rand() / RAND_MAX);
-			Action.push_back(Q_val);
-
-		}
-		Q_table.push_back(Action);
-		Action.clear();
-	}
-
-} //Not Done
-
-void Q_learn::Q_learner_SR(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y) {
-	ofstream fout;
-	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
-
-	for (int R = 0; R < 30; R++) {
-		Q_learner_init_SR();
-		fout << "\nRun" << "," << R << ",";
-		int count = 0;
-		for (int ep = 0; ep < 500; ep++) { //episodes //should be converging to a smaller amount of steps
-
-			Q_spot = agent_x + agent_y * (boundary_high_x + 1);
-			//fout  << "," << ep;
-			count = 0;
-			int QG;
-			QG = goal_x + goal_y*(boundary_high_x + 1);
-			//cout << Q_spot << "\n\n";
-			// loop this stuff until goal coordinates == agent coordinates 
-
-			while (Q_spot != QG) {
-				//sense(); //Where are we??? //being called by decide
-				//decide(); //decide where to move //being called by act
-				//act(agent_x, agent_y); // do that action from the decide function //being called by react
-				//cout << "Agent X before move: " << agent_x << endl;
-				react(agent_x, agent_y, RT); //update the Q-table using the Q equation
-											 //cout << Q_spot << "\n";
-											 //cout << "Agent X after move: " << agent_x << endl;
-				count++;
-				//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
-
-			}
-			TestG(agent_x, agent_y, goal_x, goal_y);
-			fout << "," << count;
-
-			agent_x = start_x;
-			agent_y = start_y;
-			TestE(agent_x, agent_y, start_x, start_y);
-			//cout << "agent x after reset: " << agent_x << endl;
-
-			/*
-			for (int s = 0; s < size(State); s++) {
-			for (int a = 0; a < 4; a++) {
-
-			}
-			//}*/
-
-		}
-		TestF(start_x, start_y, goal_x, goal_y, count);
-	}
-
-
-
-}
-
-
-
 
 int main()
 {
@@ -567,6 +523,10 @@ int main()
 	Q_learn QL;
 	g.agent_x = 0; //Initialize
 	g.agent_y = 0;
+	g.wall_x1 = g.goal_x - 1;
+	g.wall_y1 = g.goal_y;
+	g.wall_x2 = g.goal_x;
+	g.wall_y2 = g.goal_y - 1;
 	g.RewardTable();
 	//User input 
 	printf("Welcome to Quidditch \n\n");
@@ -609,7 +569,7 @@ int main()
 	} while (mode < 1 || mode >2);
 	if (mode == 1) {
 		//run Q-learner
-		QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
+		QL.Q_learner(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y, g.wall_x1, g.wall_y1, g.wall_x2, g.wall_y2);
 
 	}
 	if (mode == 2) {
