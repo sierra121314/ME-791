@@ -280,7 +280,7 @@ void grid::HardCoded() {
 			same++;
 		}
 		if (same == 10) {
-			
+			//TestA
 			cout << "Can't find goal" << endl;
 			break;
 		}
@@ -494,7 +494,7 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 			//TestE(agent_x, agent_y, start_x, start_y);
 			if (agent_x == goal_x && agent_y == goal_y) {
 				printf("\nCongrats! You caught the Golden Snitch!  \n\n");
-				TestG(agent_x, agent_y, goal_x, goal_y);
+				TestG(agent_x, agent_y, goal_x, goal_y); //TestB for HW3
 			}
 		}
 
@@ -544,7 +544,7 @@ int main()
 		g.agent_y = start_y;
 	}
 
-	g.TestA();
+	g.TestA(); //Not for homework 3
 
 
 	int mode;
@@ -568,11 +568,6 @@ int main()
 	}
 
 	
-	// NOT COMPLETE - For seperate state representation
-	/*
-	Q_learn QSR;
-	QSR.Q_learner_SR(g.agent_x, g.agent_y, g.RT, g.goal_x, g.goal_y, start_x, start_y);
-	*/
 	system("PAUSE");
 	//close program
 	return 0;
