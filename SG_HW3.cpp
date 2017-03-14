@@ -56,8 +56,6 @@ public:
 	void react(int &agent_x, int &agent_y, vector<int> &RT, int wall_x1, int wall_y1, int wall_x2, int wall_y2);
 	void Q_learner_init();
 	void TestD();
-	void Q_learner_SR(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x, int &goal_y, int start_x, int start_y);
-	void Q_learner_init_SR();
 
 	void TestF(int start_x, int start_y, int goal_x, int goal_y, int count);
 	void TestG(int agent_x, int agent_y, int goal_x, int goal_y);
@@ -363,7 +361,7 @@ int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_
 	if (A == 0) {
 		//to the left, to the left
 		if (agent_x - 1 >= boundary_low_x) {
-			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+			if (agent_x - 1 == wall_x1 && agent_y == wall_y1 || agent_x - 1 == wall_x2 && agent_y == wall_y2) {
 				//nothing
 			}
 			else {
@@ -371,7 +369,7 @@ int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_
 			}
 		}
 		else {
-			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x - 1 == wall_x2 && agent_y == wall_y2) {
 				//nothing
 			}
 			else {
@@ -382,7 +380,7 @@ int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_
 	else if (A == 1) {
 		//move right
 		if (agent_x + 1 < boundary_high_x) {
-			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+			if (agent_x + 1 == wall_x1 && agent_y == wall_y1 || agent_x + 1 == wall_x2 && agent_y == wall_y2) {
 				//nothing
 			}
 			else {
@@ -401,7 +399,7 @@ int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_
 	else if (A == 2) {
 		//move down
 		if (agent_y - 1 >= boundary_low_y) {
-			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+			if (agent_x == wall_x1 && agent_y - 1 == wall_y1 || agent_x == wall_x2 && agent_y - 1 == wall_y2) {
 				//nothing
 			}
 			else {
@@ -420,7 +418,7 @@ int Q_learn::act(int &agent_x, int &agent_y, int wall_x1, int wall_y1, int wall_
 	else if (A == 3) {
 		//move up up up
 		if (agent_y + 1 < boundary_high_y) {
-			if (agent_x == wall_x1 && agent_y == wall_y1 || agent_x == wall_x2 && agent_y == wall_y2) {
+			if (agent_x == wall_x1 && agent_y + 1 == wall_y1 || agent_x == wall_x2 && agent_y + 1 == wall_y2) {
 				//nothing
 			}
 			else {
@@ -467,15 +465,15 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 	ofstream fout;
 	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
 
-	for (int R = 0; R < 30; R++) {
+	
 		Q_learner_init();
-		fout << "\nRun" << "," << R << ",";
-		int count = 0;
 		
+		int count = 0;
+		int QG;
+		for (int ep = 0; ep < 50; ep++) {
 			Q_spot = agent_x + agent_y * (boundary_high_x + 1);
 			//fout  << "," << ep;
 			count = 0;
-			int QG;
 			QG = goal_x + goal_y*(boundary_high_x + 1);
 			//cout << Q_spot << "\n\n";
 			// loop this stuff until goal coordinates == agent coordinates 
@@ -486,35 +484,26 @@ void Q_learn::Q_learner(int &agent_x, int &agent_y, vector<int> &RT, int &goal_x
 				//act(agent_x, agent_y); // do that action from the decide function //being called by react
 				//cout << "Agent X before move: " << agent_x << endl;
 				react(agent_x, agent_y, RT, wall_x1, wall_y1, wall_x2, wall_y2); //update the Q-table using the Q equation
-											 //cout << Q_spot << "\n";
-											 //cout << "Agent X after move: " << agent_x << endl;
+				cout << Q_spot << "\n";
+				//cout << "Agent X after move: " << agent_x << endl;
 				count++;
 				//fout << "\t\t" << agent_x << ", " << agent_y << "\n";
 
 			}
 			fout << "," << count;
-
-			agent_x = start_x;
-			agent_y = start_y;
-			TestE(agent_x, agent_y, start_x, start_y);
-			//cout << "agent x after reset: " << agent_x << endl;
-
-			/*
-			for (int s = 0; s < size(State); s++) {
-			for (int a = 0; a < 4; a++) {
-
+			//TestE(agent_x, agent_y, start_x, start_y);
+			if (agent_x == goal_x && agent_y == goal_y) {
+				printf("\nCongrats! You caught the Golden Snitch!  \n\n");
+				TestG(agent_x, agent_y, goal_x, goal_y);
 			}
-			//}*/
-
+		}
 
 		//TestF(start_x, start_y, goal_x, goal_y, count);
-	}
+	
 
-	if (agent_x == goal_x && agent_y == goal_y) {
-		printf("\nCongrats! You caught the Golden Snitch!  \n\n");
-	}
-
+	
 }
+
 
 int main()
 {
