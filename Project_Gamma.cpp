@@ -19,10 +19,10 @@
 #include <algorithm>
 using namespace std;
 
-// min_grid_x = 0
-// min_grid_y = 0
-// max_grid_x = 100
-// max_grid_y = 100
+const int min_grid_x = 0;
+const int min_grid_y = 0;
+const int max_grid_x = 100;
+const int max_grid_y = 100;
 
 //class city //represents 1 city
 class city {
@@ -30,6 +30,8 @@ public:
 	int city_x;
 	int city_y;
 	void boundary_test_c();
+	void city_init(); //randomly choose value for x, y coordinate
+
 };
 
 
@@ -45,11 +47,16 @@ public:
 };
 
 
-
 //class Policies
 //MR_1:  initialize a population of policies - associated with a fitness
 //fitness //MR_2::  distance for the entire policy, minimal
 //
+
+void city::city_init() {
+	//randomly choose value for x, y coordinate
+	city_x = rand() % max_grid_x;
+	city_y = rand() % max_grid_y;
+}
 
 //Function - EA_Replicate
 // Takes
@@ -62,7 +69,15 @@ public:
 
 int main()
 {
+	srand(time(NULL));
+	int num_cities = 10;
+	vector<city> City_Wok; //I apologize for the Southpark reference
 	//establish a vector of cities
+	for (int c = 0; c < num_cities; c++) {
+		city C;
+		C.city_init();
+		City_Wok.push_back(C);
+	}
 	//starting_city
 
 
