@@ -41,7 +41,7 @@ public:
 	int SalesGuy_x;
 	int SalesGuy_y;
 	int distance;
-	void starting_city(); //function(starting) that the agent always starts in city #1
+	void starting_city(int city_x, int city_y); //function(starting) that the agent always starts in city #1
 	void overall_distance(); //function that after each iteration the salesman adds the distance to a overall_distance which acts as fitness
 
 };
@@ -51,6 +51,11 @@ public:
 //MR_1:  initialize a population of policies - associated with a fitness
 //fitness //MR_2::  distance for the entire policy, minimal
 //
+
+void SalesGuy::starting_city(int city_x, int city_y) {
+	SalesGuy_x = city_x;
+	SalesGuy_y = city_y;
+}
 
 void city::city_init() {
 	//randomly choose value for x, y coordinate
@@ -73,13 +78,17 @@ int main()
 	int num_cities = 10;
 	vector<city> City_Wok; //I apologize for the Southpark reference
 	//establish a vector of cities
-	for (int c = 0; c < num_cities; c++) {
-		city C;
+	city C;
+	for (int c = 0; c < num_cities; c++) {	
 		C.city_init();
-		cout << C.city_x << ", " << C.city_y << endl;
+		cout << "City " << c << "   " << C.city_x << ", " << C.city_y << endl;
 		City_Wok.push_back(C);
 	}
+	
 	//starting_city
+	SalesGuy G;
+	G.starting_city(C.city_x, C.city_y);
+
 
 
 	//loop
