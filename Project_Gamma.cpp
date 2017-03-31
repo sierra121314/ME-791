@@ -41,7 +41,7 @@ public:
 	int SalesGuy_x;
 	int SalesGuy_y;
 	int distance;
-	void starting_city(int city_x, int city_y); //function(starting) that the agent always starts in city #1
+	void starting_city(city C); //function(starting) that the agent always starts in city #1
 	void overall_distance(); //function that after each iteration the salesman adds the distance to a overall_distance which acts as fitness
 
 };
@@ -52,9 +52,9 @@ public:
 //fitness //MR_2::  distance for the entire policy, minimal
 //
 
-void SalesGuy::starting_city(int city_x, int city_y) {
-	SalesGuy_x = city_x;
-	SalesGuy_y = city_y;
+void SalesGuy::starting_city(city C) {
+	SalesGuy_x = C.city_x;
+	SalesGuy_y = C.city_y;
 }
 
 void city::city_init() {
@@ -87,8 +87,8 @@ int main()
 	
 	//starting_city
 	SalesGuy G;
-	G.starting_city(C.city_x, C.city_y);
-
+	G.starting_city(City_Wok[0]);
+	cout << "Starting City   " << G.SalesGuy_x << "," << G.SalesGuy_y << endl;
 
 
 	//loop
