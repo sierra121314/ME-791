@@ -76,6 +76,7 @@ int main()
 	for (int c = 0; c < num_cities; c++) {
 		city C;
 		C.city_init();
+		cout << C.city_x << ", " << C.city_y << endl;
 		City_Wok.push_back(C);
 	}
 	//starting_city
