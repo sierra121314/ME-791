@@ -54,7 +54,7 @@ public:
 	//
 	int fitness;
 	vector<int> policies; //vectors of integers of the index for each city
-	void init_policy(); //initialize one policy
+	void init_policy(vector<city> City_Wok); //initialize one policy
 
 };
 
@@ -71,10 +71,17 @@ void city::city_init() {
 }
 
 void Policies::init_policy(vector<city> City_Wok) {
+	vector<int> index;
+	
 	for (int p = 0; p < size(City_Wok); p++) {
-		cout << p << endl;
+		//cout << "Order " << p << endl;
+		index.push_back(p);
 	}
-
+	random_shuffle(index.begin() +1, index.end());
+	//check to see if the first city is the same and the order changes
+	for (int i = 0; i < size(City_Wok); i++) {
+		cout << "Shuffled index of policies  " << index[i] << endl;
+	}
 }
 
 //Function - EA_Replicate
