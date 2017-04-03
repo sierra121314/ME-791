@@ -71,14 +71,13 @@ void city::city_init() {
 }
 
 void Policies::init_policy(vector<city> City_Wok) {
-	vector<int> index;
-	
+		
 	for (int p = 0; p < size(City_Wok); p++) {
 		//cout << "Order " << p << endl;
-		index.push_back(p);
+		policies.push_back(p);
 	}
 	//By shuffling only after the first city, we ensure we start in the same place each time
-	random_shuffle(index.begin() +1, index.end()); //LR_5//
+	random_shuffle(policies.begin() +1, policies.end()); //LR_5//
 
 	//check to see if the first city is the same and the order changes
 	/*
@@ -89,11 +88,25 @@ void Policies::init_policy(vector<city> City_Wok) {
 
 }
 
-void EA_Replicate() {
+vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
 	//Take vector of policies and double it
-
 	// Mutate the doubled policies slightly
-
+	int R;
+	int O;
+	int S;
+	int temp;
+	vector<Policies> Gen;
+	Gen = Pop; //Copies the old population 
+	for (int i = 0; i < size(Pop); i++){
+		R = rand() % (size(Pop) - 1);
+		O = rand() % (size(City_Wok) - 1);
+		S = rand() % (size(City_Wok) - 1);
+		temp = Pop[R].policies[O];
+		Pop[R].policies[O] = Pop[R].policies[S];
+		Pop[R].policies[S] = temp;
+		Gen.push_back(Pop[R]);
+	}
+	return Gen;
 }
 // Takes
 
@@ -136,9 +149,9 @@ int main()
 	Po.init_policy(City_Wok);
 
 	//loop
-	EA_Replicate();
+	EA_Replicate(vector<Policies> Pop);
 
-	EA_Evaluate();
+	EA_Evaluate(City_Wok);
 
 	EA_Downselect();
 	
