@@ -77,21 +77,42 @@ void Policies::init_policy(vector<city> City_Wok) {
 		//cout << "Order " << p << endl;
 		index.push_back(p);
 	}
-	random_shuffle(index.begin() +1, index.end());
+	//By shuffling only after the first city, we ensure we start in the same place each time
+	random_shuffle(index.begin() +1, index.end()); //LR_5//
+
 	//check to see if the first city is the same and the order changes
+	/*
 	for (int i = 0; i < size(City_Wok); i++) {
 		cout << "Shuffled index of policies  " << index[i] << endl;
 	}
+	*/
+
 }
 
-//Function - EA_Replicate
+void EA_Replicate() {
+	//Take vector of policies and double it
+
+	// Mutate the doubled policies slightly
+
+}
 // Takes
 
-//Function - EA_Evaluate - 
+void EA_Evaluate() {
+	//calculate the distance for each policy's combined cities
+	// take the distance between the first and second city and add it to the distance between the second and the third city...
+
+	// take that combined distance and push it back to the end of a fitness vector that relates to each policy?
+
+}
 
 
-//Function - EA_Downselect
-//Binary Tournament - Take 
+void EA_Downselect() { //Binary Tournament - Take 
+	// take the fitness of one policy and compare it to another fitness of another policy at random.
+	// whichever one has the lower fitness gets put into a new vector until size(population/2)
+
+	//return that new vector
+}
+
 
 int main()
 {
@@ -102,7 +123,7 @@ int main()
 	city C;
 	for (int c = 0; c < num_cities; c++) {	
 		C.city_init();
-		cout << "City " << c << "   " << C.city_x << ", " << C.city_y << endl;
+		//cout << "City " << c << "   " << C.city_x << ", " << C.city_y << endl;
 		City_Wok.push_back(C);
 	}
 	
@@ -115,9 +136,12 @@ int main()
 	Po.init_policy(City_Wok);
 
 	//loop
-	//EA_Replicate
-	//EA_Evaluate
-	//EA_Downselect
+	EA_Replicate();
+
+	EA_Evaluate();
+
+	EA_Downselect();
+	
     return 0;
 }
 
