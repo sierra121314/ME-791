@@ -80,11 +80,11 @@ void Policies::init_policy(vector<city> City_Wok) {
 	random_shuffle(policies.begin() +1, policies.end()); //LR_5//
 	assert(*policies.begin() == 0); //LR_5
 	//check to see if the first city is the same and the order changes
-	/*
+	
 	for (int i = 0; i < size(City_Wok); i++) {
-		cout << "Shuffled index of policies  " << index[i] << endl;
+		cout << "Shuffled index of policies  " << policies[i] << endl;
 	}
-	*/
+	
 
 }
 
@@ -101,33 +101,46 @@ vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
 		R = rand() % (size(Pop) - 1);
 		O = rand() % (size(City_Wok) - 2) + 1;
 		S = rand() % (size(City_Wok) - 2) + 1;
+		while (O == S) {
+			S = rand() % (size(City_Wok) - 2) + 1;
+		}
 		temp = Pop[R].policies[O];
 		Pop[R].policies[O] = Pop[R].policies[S];
 		Pop[R].policies[S] = temp;
 		Gen.push_back(Pop[R]);
-		assert(Gen[R].policies != Pop[R].policies); //LR_4
+		//assert(Gen[R].policies != Pop[R].policies); //LR_4
 	}
 	return Gen;
 }
 
 
-void EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int city_y) {
+vector<Policies> EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int city_y, int num_cities) {
 	//calculate the distance for each policy's combined cities
 	// take the distance between the first and second city and add it to the distance between the second and the third city...
 	
 	for (int k = 0; k < size(Pop); k++) {
 		int distance = 0;
-		for (int i = 0; i < size(City_Wok) - 1; i++) {
-			for (int j = 1; j < size(City_Wok); j++) {
-				distance = sqrt((City_Wok[Pop[k].policies[j]].city_x - City_Wok[Pop[k].policies[i]].city_x) ^ 2 + (City_Wok[Pop[k].policies[j]].city_y - City_Wok[Pop[i].policies[i]].city_y) ^ 2) + distance;
-			}
+		Pop[k].fitness = 0;
+		int distance_1 = 0;
+		for (int i = 0; i < size(City_Wok) - 2; i++) {
+			distance_1 = distance;
+			distance = sqrt(pow(City_Wok[Pop[k].policies[i+1]].city_x - City_Wok[Pop[k].policies[i]].city_x, 2) + pow(City_Wok[Pop[k].policies[i++]].city_y - City_Wok[Pop[i].policies[i]].city_y, 2)) + distance;
+			assert(distance != distance_1); //LR_7
+			//cout << distance << endl;		
 		}
 		Pop[k].fitness = distance;
+		cout << Pop[k].fitness << endl;
+		assert(distance >= num_cities); //LR_8
 		assert(Pop[k].fitness != 0); //MR_2 & MR_3
 	}
-	
-	// take that combined distance and push it back to the end of a fitness vector that relates to each policy?
-
+	for (int x = 0; x < size(Pop); x++) {
+		for (int y = 0; y < size(City_Wok); y++) {
+			for (int z = y+1; z < size(City_Wok); z++){
+				assert(Pop[x].policies[y] != Pop[x].policies[z]); //LR_6
+			}
+		}
+	}
+	return Pop;
 }
 
 
@@ -149,6 +162,7 @@ vector<Policies> EA_Downselect(vector<Policies> Pop) { //Binary Tournament - Tak
 	}
 	assert(size(Pop_new) == size(Pop) / 2); //MR_4
 	//return that new vector
+
 	return Pop_new;
 }
 
@@ -159,7 +173,7 @@ int main()
 	int num_cities = 10;
 	vector<city> City_Wok; //I apologize for the Southpark reference
 	vector<Policies> Pop;
-	int Population = 10;
+	int Population = 100;
 	//establish a vector of cities
 	city C;
 	for (int c = 0; c < num_cities; c++) {	
@@ -181,12 +195,20 @@ int main()
 	}
 	assert(size(Pop) == Population/2); //MR_1
 	
+	ofstream fout;
+	fout.clear();
+	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
 	//loop
-	EA_Replicate(Pop, City_Wok);
-
-	EA_Evaluate(Pop, City_Wok, C.city_x, C.city_y);
-
-	EA_Downselect();
+	for (int t = 0; t < 100; t++){
+		Pop = EA_Replicate(Pop, City_Wok);
+		assert(size(Pop) == Population); // MR_5
+		Pop = EA_Evaluate(Pop, City_Wok, C.city_x, C.city_y, num_cities);
+		Pop = EA_Downselect(Pop);
+		fout << "\nGeneration" << "," << t;
+		for (int b = 0; b < size(Pop); b++) {
+			fout << "," << Pop[b].fitness;
+		}
+	}
 	
     return 0;
 }
