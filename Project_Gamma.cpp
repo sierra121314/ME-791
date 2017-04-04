@@ -52,7 +52,7 @@ public:
 	//MR_1:  initialize a population of policies - associated with a fitness
 	//fitness //MR_2::  distance for the entire policy, minimal
 	//
-	int fitness;
+	int fitness = 0;
 	vector<int> policies; //vectors of integers of the index for each city
 	void init_policy(vector<city> City_Wok); //initialize one policy
 
@@ -108,12 +108,23 @@ vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
 	}
 	return Gen;
 }
-// Takes
 
-void EA_Evaluate() {
+
+void EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int city_y) {
 	//calculate the distance for each policy's combined cities
 	// take the distance between the first and second city and add it to the distance between the second and the third city...
-
+	
+	for (int k = 0; k < size(Pop); k++) {
+		int distance = 0;
+		for (int i = 0; i < size(City_Wok) - 1; i++) {
+			for (int j = 1; j < size(City_Wok); j++) {
+				distance = sqrt((City_Wok[Pop[k].policies[j]].city_x - City_Wok[Pop[k].policies[i]].city_x) ^ 2 + (City_Wok[Pop[k].policies[j]].city_y - City_Wok[Pop[i].policies[i]].city_y) ^ 2) + distance;
+			}
+		}
+		Pop[k].fitness = distance;
+		assert(Pop[k].fitness != 0);
+	}
+	
 	// take that combined distance and push it back to the end of a fitness vector that relates to each policy?
 
 }
@@ -132,6 +143,7 @@ int main()
 	srand(time(NULL));
 	int num_cities = 10;
 	vector<city> City_Wok; //I apologize for the Southpark reference
+	vector<Policies> Pop;
 	//establish a vector of cities
 	city C;
 	for (int c = 0; c < num_cities; c++) {	
@@ -149,9 +161,9 @@ int main()
 	Po.init_policy(City_Wok);
 
 	//loop
-	EA_Replicate(vector<Policies> Pop);
+	EA_Replicate(Pop, City_Wok);
 
-	EA_Evaluate(City_Wok);
+	EA_Evaluate(Pop, City_Wok, C.city_x, C.city_y);
 
 	EA_Downselect();
 	
