@@ -78,7 +78,7 @@ void Policies::init_policy(vector<city> City_Wok) {
 	}
 	//By shuffling only after the first city, we ensure we start in the same place each time
 	random_shuffle(policies.begin() +1, policies.end()); //LR_5//
-
+	assert(*policies.begin() == 0); //LR_5
 	//check to see if the first city is the same and the order changes
 	/*
 	for (int i = 0; i < size(City_Wok); i++) {
@@ -99,12 +99,13 @@ vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
 	Gen = Pop; //Copies the old population 
 	for (int i = 0; i < size(Pop); i++){
 		R = rand() % (size(Pop) - 1);
-		O = rand() % (size(City_Wok) - 1);
-		S = rand() % (size(City_Wok) - 1);
+		O = rand() % (size(City_Wok) - 2) + 1;
+		S = rand() % (size(City_Wok) - 2) + 1;
 		temp = Pop[R].policies[O];
 		Pop[R].policies[O] = Pop[R].policies[S];
 		Pop[R].policies[S] = temp;
 		Gen.push_back(Pop[R]);
+		assert(Gen[R].policies != Pop[R].policies); //LR_4
 	}
 	return Gen;
 }
@@ -122,7 +123,7 @@ void EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int ci
 			}
 		}
 		Pop[k].fitness = distance;
-		assert(Pop[k].fitness != 0);
+		assert(Pop[k].fitness != 0); //MR_2 & MR_3
 	}
 	
 	// take that combined distance and push it back to the end of a fitness vector that relates to each policy?
@@ -130,11 +131,25 @@ void EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int ci
 }
 
 
-void EA_Downselect() { //Binary Tournament - Take 
+vector<Policies> EA_Downselect(vector<Policies> Pop) { //Binary Tournament - Take 
 	// take the fitness of one policy and compare it to another fitness of another policy at random.
 	// whichever one has the lower fitness gets put into a new vector until size(population/2)
-
+	vector<Policies> Pop_new;
+	for (int i = 0; i < size(Pop)/2; i++) {
+		int R;
+		int S;
+		R = rand() % (size(Pop) - 1);
+		S = rand() % (size(Pop) - 1);
+		if (Pop[R].fitness < Pop[S].fitness) {
+			Pop_new.push_back(Pop[R]);
+		}
+		else {
+			Pop_new.push_back(Pop[S]);
+		}
+	}
+	assert(size(Pop_new) == size(Pop) / 2); //MR_4
 	//return that new vector
+	return Pop_new;
 }
 
 
@@ -144,6 +159,7 @@ int main()
 	int num_cities = 10;
 	vector<city> City_Wok; //I apologize for the Southpark reference
 	vector<Policies> Pop;
+	int Population = 10;
 	//establish a vector of cities
 	city C;
 	for (int c = 0; c < num_cities; c++) {	
@@ -157,9 +173,14 @@ int main()
 	G.starting_city(City_Wok[0]);
 	cout << "Starting City   " << G.SalesGuy_x << "," << G.SalesGuy_y << endl;
 
-	Policies Po;
-	Po.init_policy(City_Wok);
-
+	
+	for (int pp = 0; pp < Population/2; pp++) {
+		Policies Po;
+		Po.init_policy(City_Wok);
+		Pop.push_back(Po);
+	}
+	assert(size(Pop) == Population/2); //MR_1
+	
 	//loop
 	EA_Replicate(Pop, City_Wok);
 
