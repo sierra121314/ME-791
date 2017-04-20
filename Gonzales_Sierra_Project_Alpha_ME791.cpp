@@ -43,6 +43,7 @@ public:
 	void Decide(vector<MAB>, ofstream& fout);
 	void TestB(vector<MAB> M, vector<int> count);
 	void Learning_Curve(vector<MAB>);
+	void Action_Curve(vector<MAB>);
 };
 
 double MAB::Pull() { //creates normal distribution, weighted random number
@@ -80,13 +81,13 @@ void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clous
 	//export data
 	//ofstream fout;
 	//fout.open("Learning_Curve.csv", ofstream::out);
-	fout << "Rewards per play" << "\n";
+	//fout << "Rewards per play" << "\n";
 	for (int i = 0; i < num_plays; i++) { //Exploration vs Exploitation
 		j = 0;
 		double b = ((double)rand() / RAND_MAX);
 		if (epsilon >= b) {
 			// pulls randomly
-			// chooses an arm at random that fits within the number of arms
+			// chooses an arm at random that  fits within the number of arms
 			j = rand() % num_arms;
 		}
 		else {
@@ -101,7 +102,7 @@ void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clous
 		val[j] = N*alpha + val[j]*(1 - alpha); //new value plus old val //updates value
 		count[j] = count[j]++; //this counts how many times each arm has been pulled...thanks Honi A.
 		for (int i = 0; i < num_arms; i++) {
-			fout << i << "," << val[i] << "\n";
+			fout << i << ',' << val[i] << "," << count[i] << "/n";
 		}
 
 	}
@@ -131,18 +132,23 @@ void Q_learner::Learning_Curve(vector<MAB> M) {
 	fout.open("Learning_Curve.csv", ofstream::out | ofstream::trunc);
 	fout << "Pulls per Average Reward for 30 statitical runs" << "\n";
 	for (int j = 0; j < 30; j++) { //30 statistical runs
-		fout << "Run " << j << "\n";
+
+		fout << "Run " << j << ",";
 		Decide(M,fout);
-		fout << "\t";	
+		fout << "\n";	
 	}
 	
 	fout.close();
 	
 };
 
+void Q_learner::Action_Curve(vector<MAB> M) {
+	
+}
+
 void TestA() {
 	//The average of many pulls from a single arm converges to that arm's mu value
-	//want to see if the final value/reward is close to the mean 
+	//want to see if the average of the last final value/reward is close to the mean 
 	MAB H; //Single arm
 	double x;
 	double R;
@@ -150,21 +156,31 @@ void TestA() {
 	R = 0;
 	H.Init();
 	ofstream fout;
+	vector<double> temp;
 	fout.open("TestA.csv", ofstream::out | ofstream::trunc);
 	fout << "Comparing last value with mean of that arm" << "\n";
 	for (int i = 1; i < 3000; i++) { //more the better
 		x=H.Pull();
 
-		R = x*0.1 + R * (1 - 0.1);
+		R = x*0.1 + R * (1 - 0.1); //value from pull function times alpha 
 		fout << i << "," << R << "\n";
+		temp.push_back(R);
 	}
-	cout << "Comparing mean and Last reward"<< "\t" << H.mu << "\t";
-	cout << R << "\n";
+	double C_Ave = 0;
+	for (int j = 0; j < size(temp); j++) {
+		C_Ave = C_Ave + temp[j]; // counting up all the rewards
+	}
+
+	double Ave;
+	Ave = C_Ave / size(temp); //taking sum off all the rewards and dividing up the how many rewards there are
+
+	cout << "Comparing mean and average reward"<< "\t" << H.mu << "\t";
+	cout << Ave << "\n";
 	
-	assert(abs(R) < 1.05*abs(H.mu) && abs(R) > 0.95*abs(H.mu));
+	assert(abs(Ave) < 1.05*abs(H.mu) && abs(Ave) > 0.95*abs(H.mu));
 	cout << "Test A Passed" << "\n";
 	fout.close();
-	//if //the mean is within a certain range of mu assert something
+	//if //the average is within a certain range of mu assert something
 
 }
 
@@ -190,7 +206,7 @@ void Q_learner::TestB(vector<MAB> M, vector<int> count) {
 			u = h;
 		}
 	}
-	assert(M[j].mu == M[u].mu);
+//	assert(M[j].mu == M[u].mu);
 	cout << "Test B Passed" << "\n";
 
 };
@@ -217,6 +233,21 @@ int main()
 	//Q_learn.Decide(M ); // vector M which is the created arms, and plugs them into the Q-learner
 
 	Q_learn.Learning_Curve(M); //Calls the Decide function 30 times
+
+	ofstream fout;
+	fout.open("Action_Curve.csv", ofstream::out | ofstream::trunc);
+	for (int j = 0; j < 30; j++) {
+		//Q_learn.Action_Curve(M);
+		//Q_learn.val.clear();
+		fout << "Pulls per Average Reward for 30 statitical runs" << "\n";
+		fout << "Run " << j << ",";
+		Q_learn.Decide(M, fout);
+		//
+		fout << "\n";
+		
+	}
+	fout.close();
+	
 	TestA();
 		
 	int input;
