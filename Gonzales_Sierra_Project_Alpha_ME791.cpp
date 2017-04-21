@@ -37,7 +37,7 @@ public:
 
 class Q_learner { 
 public:
-	Q_learner(); //constructor
+	void Q_learner1(); //constructor
 	double alpha;
 	vector<double> val; //value of each pull for an arm
 	void Decide(vector<MAB>, ofstream& fout);
@@ -98,12 +98,17 @@ void Q_learner::Decide(vector<MAB> M, ofstream& fout) { //Help from Bryant Clous
 				}
 			}			
 		}
+		//cout << j << endl;
 		N = M[j].Pull(); //pulls the decided arm
 		val[j] = N*alpha + val[j]*(1 - alpha); //new value plus old val //updates value
 		count[j] = count[j]++; //this counts how many times each arm has been pulled...thanks Honi A.
-		for (int i = 0; i < num_arms; i++) {
-			fout << i << ',' << val[i] << "," << count[i] << "/n";
+		//cout << count[j] << endl;
+		fout << i+1 << ',';
+		for (int h = 0; h < num_arms; h++){ // displays the count of each arm for the given play
+			fout << (double)count[h]/(i+1) << ",";
 		}
+		fout << endl;
+		
 
 	}
 	//Call Test B function
@@ -116,7 +121,7 @@ void MAB::Init() { //Initializer
 	sigma = (((double)rand() / RAND_MAX) - 0.5) * 2;
 };
 
-Q_learner::Q_learner(){ //initializer
+void Q_learner::Q_learner1(){ //initializer
 	for (int i = 0; i < num_arms; i++) {
 		val.push_back(0); // initializes each arm value as zero
 	}
@@ -231,16 +236,17 @@ int main()
 	Q_learner Q_learn;
 	//Call decide
 	//Q_learn.Decide(M ); // vector M which is the created arms, and plugs them into the Q-learner
-
-	Q_learn.Learning_Curve(M); //Calls the Decide function 30 times
+	Q_learn.Q_learner1();
+	//Q_learn.Learning_Curve(M); //Calls the Decide function 30 times
 
 	ofstream fout;
 	fout.open("Action_Curve.csv", ofstream::out | ofstream::trunc);
+	fout << "Pulls per Average Reward for 30 statitical runs" << "\n";
 	for (int j = 0; j < 30; j++) {
 		//Q_learn.Action_Curve(M);
 		//Q_learn.val.clear();
-		fout << "Pulls per Average Reward for 30 statitical runs" << "\n";
-		fout << "Run " << j << ",";
+		Q_learn.Q_learner1();
+		fout << "Run " << j << "\n";
 		Q_learn.Decide(M, fout);
 		//
 		fout << "\n";
