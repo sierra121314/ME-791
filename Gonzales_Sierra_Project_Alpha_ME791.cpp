@@ -19,7 +19,7 @@
 using namespace std;
 
 // Global Variable
-int num_arms = 4;  //n
+int num_arms = 100;  //n
 int num_plays = 100;
 double epsilon = 0.1; //greedy value
 
