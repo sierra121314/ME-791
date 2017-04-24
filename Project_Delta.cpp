@@ -26,6 +26,9 @@ int boundary_y_low = 0;
 int boundary_x_high = 1000;
 int boundary_y_high = 1000;
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////   B   O   A   T   /////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
 class boat {
 public:
 	int boat_x;
@@ -52,9 +55,9 @@ void boat::Init() {
 
 	//Orientation of Agent
 	int theta_deg = rand() % 360; //random degree orientation
-	theta = theta_deg * M_PI / 180;
+	theta = theta_deg * M_PI / 180; // converts degrees to radians
 
-	// Angular Speed of Agent?????????????????????????????????????????????????????
+	// Angular Speed of Agent?????
 
 	// Goal coordinates
 	//goal_x = rand() % boundary_x_high;
@@ -86,11 +89,25 @@ void boat::Simulation() {
 	
 }
 
+//////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
 int main()
 {
+	int runs;
+	runs = 10;
 	// starting positions
 	boat B;
-	B.Simulation();
+	for (int r = 0; r < runs; r++)	{
+		B.Simulation();
+
+	}
+	
 	// 
 	/*
 	for (int i = 0; i <num_stat; stat++){//number of statistical runs
