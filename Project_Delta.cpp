@@ -40,14 +40,14 @@ public:
 	double goal_y2;
 	double start_boat_x;
 	double start_boat_y;
-	double v = 0.3;
-	double w = 0;
-	double dt = 0.2;
-	double theta;
-	double T = 5.0;
-	double u;
+	double v = 3; //velocity //set//
+	double w = 0; //angular velocity
+	double dt = 0.2; //time step //set//
+	double theta; //radians
+	double T = 5.0; //set//
+	double u = 0;
 	void Init();
-	void Simulation();
+	void Simulation(ofstream& fout);
 };
 
 void boat::Init() {
@@ -62,10 +62,11 @@ void boat::Init() {
 	//Orientation of Agent
 	//double theta_deg = rand() % 360; //random degree orientation
 	//theta = theta_deg * PI / 180; // converts degrees to radians
-	theta = 0;
+	theta = PI/2;
 
 	// Angular Speed of Agent
-	w = rand() % 2*PI;
+	//w = rand() % 2*PI;
+	w = 0;
 
 	// Goal coordinates
 	//goal_x1 = rand() % boundary_x_high;
@@ -79,7 +80,7 @@ void boat::Init() {
 
 }
 
-void boat::Simulation() {
+void boat::Simulation(ofstream& fout) {
 	double y;
 	double m;
 	double b;
@@ -95,18 +96,21 @@ void boat::Simulation() {
 			//Always starts boat in same position
 			boat_x = start_boat_x;
 			boat_y = start_boat_y;
-			for (int i = 0; i < 5; i++) {
+			for (int i = 0; i < 100; i++) {
+				cout << boat_x << endl;
 				boat_x1 = boat_x + v*sin(theta)*dt;
-				cout << boat_y << endl;
 				boat_y1 = boat_y + v*cos(theta)*dt;
-				theta = theta + w*dt;
-				w = w + (u - w)*dt / T;
+				theta = theta + w*dt; 
+				w = w + (u - w)*dt / T; 
 				m = (boat_y1 - boat_y) / (boat_x1 - boat_x);
 				b = boat_y1 - m*boat_x1;
-				y = m*goal_x1+b;
-				boat_x = boat_x1;
-				boat_y = boat_y1;
+				y = m*goal_x1+b; //equation of a line
+				boat_x = boat_x1; //setting the new x value
+				boat_y = boat_y1; //setting the new y value
+				fout << boat_x << ',' << boat_y << endl;
 			} //for loop
+			assert(boat_y <= goal_y2 && boat_y >= goal_y1);
+			break;
 		}
 		
 	} //while loop
@@ -133,14 +137,20 @@ double NN::Neural_Network(double u) { //returns control signal to the simulation
 int main()
 {
 	int runs;
-	runs = 10;
+	runs = 1;
 	// starting positions
 	boat B;
+
+	ofstream fout;
+	fout.open("Movement.csv", ofstream::out | ofstream::trunc);
+	fout << "Coordinates of Boat for each time step" << "\n";
+
 	for (int r = 0; r < runs; r++)	{
-		B.Simulation();
+		fout << "Run" << r << "\n";
+		B.Simulation(fout);
 
 	}
-
+	fout.close();
 
 	//loop simulation with NN
 	
