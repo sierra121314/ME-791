@@ -80,11 +80,11 @@ void boat::Init() {
 }
 
 void boat::Simulation() {
-	int y;
-	int m;
-	int b;
-	int boat_x1;
-	int boat_y1;
+	double y;
+	double m;
+	double b;
+	double boat_x1;
+	double boat_y1;
 	Init(); //define starting position and goal position
 
 	cout << boat_y << ',' << boat_x << endl;
@@ -102,6 +102,7 @@ void boat::Simulation() {
 				theta = theta + w*dt;
 				w = w + (u - w)*dt / T;
 				m = (boat_y1 - boat_y) / (boat_x1 - boat_x);
+				b = boat_y1 - m*boat_x1;
 				y = m*goal_x1+b;
 				boat_x = boat_x1;
 				boat_y = boat_y1;
