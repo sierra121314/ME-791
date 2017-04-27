@@ -62,7 +62,7 @@ void boat::Init() {
 	//Orientation of Agent
 	//double theta_deg = rand() % 360; //random degree orientation
 	//theta = theta_deg * PI / 180; // converts degrees to radians
-	theta = PI/2;
+	theta = 0;
 
 	// Angular Speed of Agent
 	//w = rand() % 2*PI;
@@ -88,31 +88,36 @@ void boat::Simulation(ofstream& fout) {
 	double boat_y1;
 	Init(); //define starting position and goal position
 
-	cout << boat_y << ',' << boat_x << endl;
+	boat_x = start_boat_x;
+	boat_y = start_boat_y;
+
+	cout << boat_x << ',' << boat_y << endl;
 
 	// while agent is in bounds or the agent finds the goal
 	while (boat_x > boundary_x_low && boat_x < boundary_x_high && boat_y > boundary_y_low && boat_y < boundary_y_high) {
-		if (boat_y <= goal_y2 && boat_y >= goal_y1){
-			//Always starts boat in same position
-			boat_x = start_boat_x;
-			boat_y = start_boat_y;
-			for (int i = 0; i < 100; i++) {
-				cout << boat_x << endl;
-				boat_x1 = boat_x + v*sin(theta)*dt;
-				boat_y1 = boat_y + v*cos(theta)*dt;
-				theta = theta + w*dt; 
-				w = w + (u - w)*dt / T; 
-				m = (boat_y1 - boat_y) / (boat_x1 - boat_x);
-				b = boat_y1 - m*boat_x1;
-				y = m*goal_x1+b; //equation of a line
-				boat_x = boat_x1; //setting the new x value
-				boat_y = boat_y1; //setting the new y value
-				fout << boat_x << ',' << boat_y << endl;
-			} //for loop
-			assert(boat_y <= goal_y2 && boat_y >= goal_y1);
+		//Always starts boat in same position
+		
+		if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2+.05*goal_x2) && boat_x >= (goal_x2-.05*goal_x2)) {
 			break;
 		}
-		
+		for (int i = 0; i < 100; i++) {
+			
+			cout << boat_x << ',' << boat_y << endl;
+			boat_x1 = boat_x + v*cos(theta)*dt;
+			boat_y1 = boat_y + v*sin(theta)*dt;
+			theta = theta + w*dt; 
+			w = w + (u - w)*dt / T; 
+			m = (boat_y1 - boat_y) / (boat_x1 - boat_x); //slope
+			b = boat_y1 - m*boat_x1; // y intercept
+			y = m*goal_x1+b; //equation of a line
+			boat_x = boat_x1; //setting the new x value
+			boat_y = boat_y1; //setting the new y value
+			fout << boat_x << ',' << boat_y << ',' << theta << ',' << v << endl;
+			if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2)) {
+				break;
+			}
+
+		}
 	} //while loop
 	
 }
@@ -148,7 +153,7 @@ int main()
 	for (int r = 0; r < runs; r++)	{
 		fout << "Run" << r << "\n";
 		B.Simulation(fout);
-
+		//assert(B.boat_y <= B.goal_y2 && B.boat_y >= B.goal_y1);
 	}
 	fout.close();
 
