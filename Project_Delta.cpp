@@ -54,7 +54,7 @@ void boat::Init() {
 	// Starting coordinates of agent
 	//start_boat_x = rand() % boundary_x_high;
 	//start_boat_y = rand() % boundary_y_high;
-	start_boat_x = 1;
+	start_boat_x = 6;
 	start_boat_y = 2;
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
@@ -73,9 +73,9 @@ void boat::Init() {
 	//goal_y1 = rand() % (boundary_y_high-2);
 	//goal_x2 = goal_x1;
 	//goal_y2 = goal_y1 - 2;
-	goal_x1 = 5; //testing
+	goal_x1 = 10; //testing
 	goal_y1 = 1; //testing
-	goal_x2 = 5; //testing
+	goal_x2 = 10; //testing
 	goal_y2 = 3; //testing
 
 }
@@ -92,41 +92,34 @@ void boat::Simulation(ofstream& fout) {
 
 	cout << boat_x << ',' << boat_y << endl;
 
-	// while agent is in bounds or the agent finds the goal
-	while (boat_x >= boundary_x_low && boat_x <= boundary_x_high && boat_y >= boundary_y_low && boat_y <= boundary_y_high) {
 		
+	for (int i = 0; i < 10000; i++) {
+		
+		cout << boat_x << ',' << boat_y << endl;
+		boat_x1 = boat_x + v*cos(theta)*dt;
+		boat_y1 = boat_y + v*sin(theta)*dt;
+		theta = theta + w*dt; 
+		w = w + (u - w)*dt / T; 
+		m = (boat_y1 - boat_y) / (boat_x1 - boat_x); //slope
+		b = boat_y1 - m*boat_x1; // y intercept
+		y = m*goal_x1+b; //equation of a line
+		boat_x = boat_x1; //setting the new x value
+		boat_y = boat_y1; //setting the new y value
+		fout << boat_x << ',' << boat_y << ',' << theta << ',' << v << endl;
 		/////// CONDITIONS TO QUIT THE LOOP ///////////
-		if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2+.05*goal_x2) && boat_x >= (goal_x2-.05*goal_x2)) {
+		if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2)) {
 			break;
-			// If the boat is between the y goal posts AND
-			// If the boat is within 5% of the x goal posts then break
 		}
-
-		for (int i = 0; i < 10000; i++) {
-			
-			cout << boat_x << ',' << boat_y << endl;
-			boat_x1 = boat_x + v*cos(theta)*dt;
-			boat_y1 = boat_y + v*sin(theta)*dt;
-			theta = theta + w*dt; 
-			w = w + (u - w)*dt / T; 
-			m = (boat_y1 - boat_y) / (boat_x1 - boat_x); //slope
-			b = boat_y1 - m*boat_x1; // y intercept
-			y = m*goal_x1+b; //equation of a line
-			boat_x = boat_x1; //setting the new x value
-			boat_y = boat_y1; //setting the new y value
-			fout << boat_x << ',' << boat_y << ',' << theta << ',' << v << endl;
-
-			/////// CONDITIONS TO QUIT THE LOOP ///////////
-			if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2)) {
-				break;
-			}
-
+		cout << "boat not by goal" << endl;
+		if (boat_x <= boundary_x_low || boat_x >= boundary_x_high || boat_y <= boundary_y_low || boat_y >= boundary_y_high) {
+			break;
 		}
-	} //while loop
+		cout << "boat within boundary" << endl;
+	} //for loop
 
 
 	//////// MR_2 ///////////
-	assert(boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2));
+	//assert(boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
