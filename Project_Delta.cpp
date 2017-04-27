@@ -62,7 +62,7 @@ void boat::Init() {
 	//Orientation of Agent
 	//double theta_deg = rand() % 360; //random degree orientation
 	//theta = theta_deg * PI / 180; // converts degrees to radians
-	theta = 0;
+	theta = PI;
 
 	// Angular Speed of Agent
 	//w = rand() % 2*PI;
@@ -86,21 +86,23 @@ void boat::Simulation(ofstream& fout) {
 	double b;
 	double boat_x1;
 	double boat_y1;
-	Init(); //define starting position and goal position
-
+	
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
 
 	cout << boat_x << ',' << boat_y << endl;
 
 	// while agent is in bounds or the agent finds the goal
-	while (boat_x > boundary_x_low && boat_x < boundary_x_high && boat_y > boundary_y_low && boat_y < boundary_y_high) {
-		//Always starts boat in same position
+	while (boat_x >= boundary_x_low && boat_x <= boundary_x_high && boat_y >= boundary_y_low && boat_y <= boundary_y_high) {
 		
+		/////// CONDITIONS TO QUIT THE LOOP ///////////
 		if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2+.05*goal_x2) && boat_x >= (goal_x2-.05*goal_x2)) {
 			break;
+			// If the boat is between the y goal posts AND
+			// If the boat is within 5% of the x goal posts then break
 		}
-		for (int i = 0; i < 100; i++) {
+
+		for (int i = 0; i < 10000; i++) {
 			
 			cout << boat_x << ',' << boat_y << endl;
 			boat_x1 = boat_x + v*cos(theta)*dt;
@@ -113,13 +115,18 @@ void boat::Simulation(ofstream& fout) {
 			boat_x = boat_x1; //setting the new x value
 			boat_y = boat_y1; //setting the new y value
 			fout << boat_x << ',' << boat_y << ',' << theta << ',' << v << endl;
+
+			/////// CONDITIONS TO QUIT THE LOOP ///////////
 			if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2)) {
 				break;
 			}
 
 		}
 	} //while loop
-	
+
+
+	//////// MR_2 ///////////
+	assert(boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -143,9 +150,13 @@ int main()
 {
 	int runs;
 	runs = 1;
-	// starting positions
+	
 	boat B;
 
+	//define starting position and goal position
+	B.Init(); 
+
+	////////// START SIMULATION ///////////////
 	ofstream fout;
 	fout.open("Movement.csv", ofstream::out | ofstream::trunc);
 	fout << "Coordinates of Boat for each time step" << "\n";
@@ -153,7 +164,7 @@ int main()
 	for (int r = 0; r < runs; r++)	{
 		fout << "Run" << r << "\n";
 		B.Simulation(fout);
-		//assert(B.boat_y <= B.goal_y2 && B.boat_y >= B.goal_y1);
+		
 	}
 	fout.close();
 
