@@ -135,11 +135,21 @@ void boat::Simulation(ofstream& fout, int n) {
 			break;
 		}
 		cout << "boat within boundary" << endl;
-		/////// REPLACE THIS WITH WHAT BRYANT WENT OVER
-		if (boat_y <= goal_y2 && boat_y >= goal_y1 && boat_x <= (goal_x2 + .05*goal_x2) && boat_x >= (goal_x2 - .05*goal_x2)) {
-			break;
+		
+		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
+			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
+				if (y >= goal_y1 && y <= goal_y2) {
+					break;
+				}
+			}
 		}
-		///////////////
+		else {		//If x2 is to the left of x1
+			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
+				if (y >= goal_y1 && y <= goal_y2) {
+					break;
+				}
+			}
+		}
 		cout << "boat not close to goal" << endl;
 		
 
@@ -177,7 +187,7 @@ public:
 int main()
 {
 	int generations;
-	runs = 1;
+	generations = 1;
 	
 	Evolutionary EA;
 	boat B;
