@@ -51,6 +51,7 @@ public:
 	double theta; //radians
 	double T = 5.0; //set//
 	double u = 0;
+	double fitness;
 	void Init();
 	void Simulation(ofstream& fout, int n);
 	neural_network NN;
@@ -96,7 +97,8 @@ void boat::Simulation(ofstream& fout, int n) {
 	double b;
 	double boat_x1;
 	double boat_y1;
-	double boat_x_at_y;
+	double time;
+	double distance;
 	
 	// intialize starting positions
 	boat_x = start_boat_x;
@@ -110,7 +112,9 @@ void boat::Simulation(ofstream& fout, int n) {
 		//Give to NN
 		
 		cout << boat_x << ',' << boat_y << endl;
+
 		// GET VALUE OF U FROM NN
+
 
 		// CALCULATE X,Y,THETA,W //
 		boat_x1 = boat_x + v*cos(theta)*dt;
@@ -151,29 +155,31 @@ void boat::Simulation(ofstream& fout, int n) {
 			}
 		}
 		cout << "boat not close to goal" << endl;
-		
-
+		time = dt*i;
+	
 	} //for loop
 
 	////////// EXITING COORDINATES ////////
 	cout << boat_x << ',' << boat_y << endl;
 	// CALCULATE THE FITNESS - uses distance and time
-	
-	}
+	fitness = distance*time;
+}
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////   N E U R A L      N E T W O R K  ////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
 class NN {
 public:
-	
 	double Neural_Network(double u);
+
 };
+
 
 double NN::Neural_Network(double u) { //returns control signal to the simulation
 	//calculates based on the weights given to it based on the EA
 	return u;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////   EVOLUTIONARY ALGORITHM  ////////////////////////////////////
