@@ -59,7 +59,7 @@ public:
 };
 
 void boat::Init() { //pass in NN and EA
-	// STARTING POSITION OF BOAT //
+	/// STARTING POSITION OF BOAT ///
 	//start_boat_x = rand() % boundary_x_high;
 	//start_boat_y = rand() % boundary_y_high;
 	start_boat_x = 6;
@@ -67,18 +67,18 @@ void boat::Init() { //pass in NN and EA
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
 
-	//Orientation of Agent
+	/// ORIENTATION OF AGENT ///
 	double theta_deg = rand() % 360; //random degree orientation
 	starting_theta = theta_deg * PI / 180; // converts degrees to radians
 	//starting_theta = 0;
 	theta = starting_theta;
 
-	// Angular Speed of Agent
+	/// ANGULAR SPEED OF AGENT ///
 	starting_w = rand() % 2*PI;
 	//starting_w = 0;
 	w = starting_w;
 
-	// Goal coordinates
+	/// GOAL POSITION ///
 	//goal_x1 = rand() % boundary_x_high;
 	//goal_y1 = rand() % (boundary_y_high-2);
 	//goal_x2 = goal_x1;
@@ -120,25 +120,29 @@ void boat::Simulation(ofstream& fout, int n) {
 		// GET VALUE OF U FROM NN
 
 
-		// CALCULATE X,Y,THETA,W //
+		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
 		boat_y1 = boat_y + v*sin(theta)*dt;
 		theta = theta + w*dt; 
 		w = w + (u - w)*dt / T; 
 		
-		// CALCULATIONS FOR INTERCEPT //
-		m = (boat_y1 - boat_y) / (boat_x1 - boat_x); //slope
-		b = boat_y1 - m*boat_x1; // y intercept
-		y = m*goal_x1+b; //equation of a line
+		/// CALCULATIONS FOR INTERCEPT ///
+		m = (boat_y1 - boat_y) / (boat_x1 - boat_x); ///slope
+		b = boat_y1 - m*boat_x1; /// y intercept
+		y = m*goal_x1+b; ///equation of a line
 
-		// UPDATE NEW X,Y, VALUES
-		boat_x = boat_x1; //setting the new x value
-		boat_y = boat_y1; //setting the new y value
+		/// UPDATE NEW X,Y, VALUES ///
+		boat_x = boat_x1; ///setting the new x value
+		boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
-		// CALCULATE DISTANCE TO GOAL //
+		/// CALCULATE DISTANCE TO GOAL /// 
+		distance_x = pow(goal_x1 - boat_x, 2);
+		distance_y = pow(goal_y1 - boat_y, 2);
+		cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
+		distance = distance + sqrt(distance_x + distance_y);
 
-		/////// CONDITIONS TO QUIT THE LOOP ///////////
+		/// CONDITIONS TO QUIT THE LOOP ////
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
 			break;
 		}
@@ -159,18 +163,16 @@ void boat::Simulation(ofstream& fout, int n) {
 			}
 		}
 		cout << "boat not close to goal" << endl;
+
+		// CALCULATIONS FOR TIME FOR FITNESS //
 		time = dt*i;
-		distance_x = pow(goal_x1 - boat_x, 2);
-		distance_y = pow(goal_y1 - boat_y, 2);
-		cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
-		distance = distance + sqrt(distance_x + distance_y);
-	
+		
 	} //for loop
 
 	////////// EXITING COORDINATES ////////
 	cout << boat_x << ',' << boat_y << endl;
 
-	// CALCULATE THE FITNESS - uses distance and time // MR_4 //
+	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	fitness = distance*time; //overall distance it took to get to the goal
 	//cout << "fitness" << fitness << endl;
 }
