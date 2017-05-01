@@ -90,7 +90,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream& fout, int s) {
+void boat::Simulation(ofstream& fout, int s, vector<policy> population) {
 	//pass in weights
 	double y;
 	double m;
@@ -147,6 +147,8 @@ void boat::Simulation(ofstream& fout, int s) {
 		cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
 		distance = distance + sqrt(distance_x + distance_y);
 
+		
+
 		/// CONDITIONS TO QUIT THE LOOP ////
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
 			break;
@@ -180,6 +182,7 @@ void boat::Simulation(ofstream& fout, int s) {
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	fitness = distance*time; //overall distance it took to get to the goal
 	//cout << "fitness" << fitness << endl;
+	//population[s].fitness = fabs(fitness);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -205,7 +208,17 @@ class Evolutionary {
 public:
 
 	vector <vector<double>> weights;
+	double EA_downselect();
+	double EA_replicate();
 };
+
+double Evolutionary::EA_downselect() {
+
+}
+
+double Evolutionary::EA_replicate() {
+
+}
 
 int main()
 {
@@ -257,16 +270,18 @@ int main()
 		}	
 		// UPDATE EA WITH FITNESS
 		// EA - DOWNSELECT WITH GIVEN FITNESS
+		//population = EA_downselect();
 		// EA - MUTATE and repopulate WEIGHTS
-		
+		//population = EA_replicate();
 		
 	}
-	//////// MR_2 ///////////
-	//assert(B.boat_y <= B.goal_y2 && B.boat_y >= B.goal_y1 && B.boat_x <= (B.goal_x2 + .05*B.goal_x2) && B.boat_x >= (B.goal_x2 - .05*B.goal_x2));
-	cout << "Boat passed through goal" << endl;
-
 	fout.close();
 
+	//////// MR_2 ///////////
+	//assert(B.boat_y <= B.goal_y2 && B.boat_y >= B.goal_y1 && B.boat_x <= (B.goal_x2 + .05*B.goal_x2) && B.boat_x >= (B.goal_x2 - .05*B.goal_x2));
+	//cout << "Boat passed through goal" << endl;
+
+	//sort(population.begin(), population.end(), less_than_key());
 	
 	int input;
 	cin >> input;
