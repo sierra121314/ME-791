@@ -68,8 +68,8 @@ void boat::Init() { //pass in NN and EA
 	boat_y = start_boat_y;
 
 	/// ORIENTATION OF AGENT ///
-	double theta_deg = rand() % 360; //random degree orientation
-	starting_theta = theta_deg * PI / 180; // converts degrees to radians
+	double theta_deg = rand() % 360; ///random degree orientation
+	starting_theta = theta_deg * PI / 180; /// converts degrees to radians
 	//starting_theta = 0;
 	theta = starting_theta;
 
@@ -90,7 +90,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream& fout, int n) {
+void boat::Simulation(ofstream& fout, int s) {
 	//pass in weights
 	double y;
 	double m;
@@ -110,15 +110,20 @@ void boat::Simulation(ofstream& fout, int n) {
 	theta = starting_theta;
 	distance = 0;
 
-	for (int i = 0; i < 10000; i++) {
+	for (int i = 0; i < 1000; i++) {
 
 		// Get input vector for NN - x,y,w,theta
+		vector<double> state;
+		state.push_back(boat_x);
+		state.push_back(boat_y);
+		NN.set_vector_input(state);
 		//Give to NN
 		
 		cout << boat_x << ',' << boat_y << endl;
 
 		// GET VALUE OF U FROM NN
-
+		NN.execute();
+		u = NN.get_output(0);
 
 		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
@@ -164,7 +169,7 @@ void boat::Simulation(ofstream& fout, int n) {
 		}
 		cout << "boat not close to goal" << endl;
 
-		// CALCULATIONS FOR TIME FOR FITNESS //
+		/// CALCULATIONS FOR TIME FOR FITNESS //
 		time = dt*i;
 		
 	} //for loop
@@ -204,28 +209,52 @@ public:
 
 int main()
 {
-	int generations;
-	generations = 1;
 	
-	//Evolutionary EA;
-	boat B;
+	int MAX_GENERATIONS = 300;
+	int pop_size = 100;
+	srand(time(NULL));
 
-	//define starting position and goal position
+	//Evolutionary EA;
+	
+	/// SET UP NEURAL NETWORK ///
+	neural_network NN;
+	vector<double> vi;
+	vector<double> weights; 
+	NN.setup(1, 5, 1); ///1 input, 5 hidden, 1 output (Bias units hidden from user)
+
+	NN.set_in_min_max(0.0, 5.0); /// limits of input for normalization
+	NN.set_out_min_max(-5.0, 30.0); /// limits of outputs for normalization
+	NN.set_vector_input(vi); /// vector of inputs
+
+
+	/// DEFINE STARTING POSITION AND GOAL POSITION ///
+	boat B;
 	B.Init(); 
+
+	/// INITIALIZE POLICIES ///
+	vector<policy> population;
+	for (int p = 0; p < pop_size; p++) {
+		policy A;
+		A.init(NN.get_number_of_weights());
+		population.push_back(A);
+	}
+	assert(population.size() == pop_size);
 
 	////////// START SIMULATION ///////////////
 	ofstream fout;
-	///////// MR_3 ////////////
+	/// MR_3 ///
 	fout.open("Movement.csv", ofstream::out | ofstream::trunc);
 	fout << "Coordinates of Boat for each time step" << "\n";
 
-	for (int g = 0; g < generations; g++)	{
+	for (int g = 0; g < MAX_GENERATIONS; g++)	{
 		//for (int n = 0; n < EA.weights.size(); n++) {
-		for (int n = 0; n < 15; n++) {
-			fout << "Run" << n << "\n";
-			B.Simulation(fout,n);
+		for (int s = 0; s < 15; s++) {
+			fout << "Sim" << s << "\n";
+			NN.set_weights(population.at(s).weights, true);
+			
+			B.Simulation(fout,s);
 
-		}
+		}	
 		// UPDATE EA WITH FITNESS
 		// EA - DOWNSELECT WITH GIVEN FITNESS
 		// EA - MUTATE and repopulate WEIGHTS
