@@ -135,7 +135,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
 	w = starting_w;
-	//cout << w << endl;
+	//cout << boat_x << "," << boat_y << endl;
 	theta = starting_theta;
 	distance = 0;
 
@@ -149,13 +149,13 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		NN.set_vector_input(state);
 		//Give to NN
 		
-		cout << boat_x << ',' << boat_y << endl;
-		cout << w << endl;
+		//cout << boat_x << ',' << boat_y << endl;
+		//cout << w << endl;
 		/// GET VALUE OF U FROM NN
 		NN.execute();
-		cout << "poop" << endl;
+		//cout << "poop" << endl;
 		u = NN.get_output(0);
-		cout << "u" << u << endl;
+		//cout << "u" << u << endl;
 
 		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
@@ -168,6 +168,25 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		b = boat_y1 - m*boat_x1; /// y intercept
 		y = m*goal_x1+b; ///equation of a line
 
+
+		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
+			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
+				if (y >= goal_y1 && y <= goal_y2) {
+					distance = distance - 10;
+					break;
+				}
+			}
+		}
+		else {		//If x2 is to the left of x1
+			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
+				if (y >= goal_y1 && y <= goal_y2) {
+					distance = distance - 10;
+					break;
+				}
+			}
+		}
+		//cout << "boat not close to goal" << endl;
+
 		/// UPDATE NEW X,Y, VALUES ///
 		boat_x = boat_x1; ///setting the new x value
 		boat_y = boat_y1; ///setting the new y value
@@ -176,32 +195,16 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		/// CALCULATE DISTANCE TO GOAL /// 
 		distance_x = pow(goal_x1 - boat_x, 2);
 		distance_y = pow(goal_y1 - boat_y, 2);
-		cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
+		//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
 		distance = distance + sqrt(distance_x + distance_y);
 
-		
-
 		/// CONDITIONS TO QUIT THE LOOP ////
-		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
+		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high){
+			distance = distance + 10000;
 			break;
 		}
-		cout << "boat within boundary" << endl;
+		//cout << "boat within boundary" << endl;
 		
-		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
-			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
-				if (y >= goal_y1 && y <= goal_y2) {
-					break;
-				}
-			}
-		}
-		else {		//If x2 is to the left of x1
-			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
-				if (y >= goal_y1 && y <= goal_y2) {
-					break;
-				}
-			}
-		}
-		cout << "boat not close to goal" << endl;
 
 		/// CALCULATIONS FOR TIME FOR FITNESS //
 		time = dt*i;
@@ -209,7 +212,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	} //for loop
 
 	////////// EXITING COORDINATES ////////
-	cout << boat_x << ',' << boat_y << endl;
+	cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	fitness = distance*time; //overall distance it took to get to the goal
@@ -276,7 +279,7 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 int main()
 {
 	
-	int MAX_GENERATIONS = 300;
+	int MAX_GENERATIONS = 5;
 	int pop_size = 100;
 	srand(time(NULL));
 
@@ -284,8 +287,6 @@ int main()
 	int num_weights = 0;
 	
 	/// SET UP NEURAL NETWORK ///
-	//neural_network NN;
-	//vector<double> vi;
 	 
 	NN.setup(3, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
 
@@ -300,7 +301,7 @@ int main()
 
 	//NN.set_vector_input(vi); /// vector of inputs
 	num_weights = NN.get_number_of_weights();
-
+	
 	/// DEFINE STARTING POSITION AND GOAL POSITION ///
 	boat B;
 	B.Init();
@@ -324,17 +325,20 @@ int main()
 		
 		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
+			cout << population.size() << endl;
 			NN.set_weights(population.at(s).weights, true);
 			
 			B.Simulation(fout,s,population,population.at(s).fitness);
+			//cout << num_weights << endl;
 
+			// UPDATE EA WITH FITNESS
+
+			/// EA - MUTATE and repopulate WEIGHTS
+			population = EA_Replicate(population, num_weights);
+			/// EA - DOWNSELECT WITH GIVEN FITNESS
+			population = EA_Downselect(population);
 		}	
-		// UPDATE EA WITH FITNESS
 		
-		/// EA - MUTATE and repopulate WEIGHTS
-		population = EA_Replicate(population, num_weights);
-		/// EA - DOWNSELECT WITH GIVEN FITNESS
-		population = EA_Downselect(population);
 	}
 	fout.close();
 
