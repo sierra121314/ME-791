@@ -22,7 +22,7 @@
 #include "LY_NN.h"
 
 using namespace std;
-
+neural_network NN;
 #define PI 3.1415
 
 int boundary_x_low = 0;
@@ -83,7 +83,7 @@ public:
 	double u = 0;
 	void Init();
 	void Simulation(ofstream& fout, int s, vector<Policies> population, double fitness);
-	neural_network NN;
+	
 	//Evolutionary EA;
 };
 
@@ -284,7 +284,7 @@ int main()
 	int num_weights = 0;
 	
 	/// SET UP NEURAL NETWORK ///
-	neural_network NN;
+	//neural_network NN;
 	//vector<double> vi;
 	 
 	NN.setup(3, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
