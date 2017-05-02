@@ -39,24 +39,23 @@ public:
 	//MR_1:  initialize a population of policies - associated with a fitness
 	//fitness //MR_2::  distance for the entire policy, minimal
 	//
-	int fitness = 0;
-	vector<int> policies; //vectors of integers of the index for each city
+	double fitness = 0;
 	void init_policy(int num_weights); //initialize one policy
-
+	vector<double> weights;
 };
 
 void Policies::init_policy(int num_weights) {
 	for (int p = 0; p < num_weights; p++) {
 		//cout << "Order " << p << endl;
-		policies.push_back(p);
+		weights.push_back(p);
 	}
 	//By shuffling only after the first city, we ensure we start in the same place each time
-	random_shuffle(policies.begin() + 1, policies.end()); //LR_5//
-	assert(*policies.begin() == 0); //LR_5
+	random_shuffle(weights.begin() + 1, weights.end()); 
+	assert(*weights.begin() == 0); 
 									//check to see if the first city is the same and the order changes
 
 	for (int i = 0; i < num_weights; i++) {
-		//cout << "Shuffled index of policies  " << policies[i] << endl;
+		//cout << "Shuffled index of policies  " << weights[i] << endl;
 	}
 }
 
@@ -75,16 +74,15 @@ public:
 	double start_boat_x;
 	double start_boat_y;
 	double starting_theta;
-	double  starting_w;
+	double starting_w;
 	double v = 3; //velocity //set//
 	double w = 0; //angular velocity
 	double dt = 0.2; //time step //set//
 	double theta; //radians
 	double T = 5.0; //set//
 	double u = 0;
-	double fitness;
 	void Init();
-	void Simulation(ofstream& fout, int s, vector<Policies> population);
+	void Simulation(ofstream& fout, int s, vector<Policies> population, double fitness);
 	neural_network NN;
 	//Evolutionary EA;
 };
@@ -105,7 +103,7 @@ void boat::Init() { //pass in NN and EA
 	theta = starting_theta;
 
 	/// ANGULAR SPEED OF AGENT ///
-	starting_w = rand() % 2*PI;
+	starting_w = rand() % 6;
 	//starting_w = 0;
 	w = starting_w;
 
@@ -121,7 +119,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream &fout, int s, vector<Policies> population) {
+void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double fitness) {
 	//pass in weights
 	double y;
 	double m;
@@ -147,14 +145,17 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population) {
 		vector<double> state;
 		state.push_back(boat_x);
 		state.push_back(boat_y);
+		state.push_back(theta);
 		NN.set_vector_input(state);
 		//Give to NN
 		
 		cout << boat_x << ',' << boat_y << endl;
-
-		// GET VALUE OF U FROM NN
+		cout << w << endl;
+		/// GET VALUE OF U FROM NN
 		NN.execute();
+		cout << "poop" << endl;
 		u = NN.get_output(0);
+		cout << "u" << u << endl;
 
 		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
@@ -216,26 +217,12 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population) {
 	//population[s].fitness = fabs(fitness);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////   N E U R A L      N E T W O R K  ////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////////////
-class NN {
-public:
-	double Neural_Network(double u);
-
-};
-
-
-double NN::Neural_Network(double u) { //returns control signal to the simulation
-	//calculates based on the weights given to it based on the EA
-	return u;
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////   EVOLUTIONARY ALGORITHM  ////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////
-vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
+vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 	//Take vector of policies and double it
 	// Mutate the doubled policies slightly
 	int R;
@@ -243,69 +230,41 @@ vector<Policies> EA_Replicate(vector<Policies> Pop, vector<city> City_Wok) {
 	int S;
 	int temp;
 	vector<Policies> Gen;
-	Gen = Pop; //Copies the old population 
-	for (int i = 0; i < size(Pop); i++) {
-		R = rand() % (size(Pop) - 1);
-		O = rand() % (size(City_Wok) - 2) + 1;
-		S = rand() % (size(City_Wok) - 2) + 1;
+	Gen = population; //Copies the old population 
+	for (int i = 0; i < size(population); i++) {
+		R = rand() % (size(population) - 1);
+		O = rand() % ((num_weights) - 2) + 1;
+		S = rand() % ((num_weights) - 2) + 1;
 		while (O == S) {
-			S = rand() % (size(City_Wok) - 2) + 1;
+			S = rand() % (num_weights - 2) + 1;
 		}
-		temp = Pop[R].policies[O];
-		Pop[R].policies[O] = Pop[R].policies[S];
-		Pop[R].policies[S] = temp;
-		Gen.push_back(Pop[R]);
-		//assert(Gen[R].policies != Pop[R].policies); //LR_4
+		temp = population[R].weights[O];
+		population[R].weights[O] = population[R].weights[S];
+		population[R].weights[S] = temp;
+		Gen.push_back(population[R]);
+		//assert(Gen[R].weights != Pop[R].weights); //LR_4
 	}
 	return Gen;
 }
 
-vector<Policies> EA_Evaluate(vector<Policies> Pop, vector<city> City_Wok, int city_x, int city_y, int num_cities) {
-	//calculate the distance for each policy's combined cities
-	// take the distance between the first and second city and add it to the distance between the second and the third city...
 
-	for (int k = 0; k < size(Pop); k++) {
-		int distance = 0;
-		Pop[k].fitness = 0;
-		int distance_1 = 0;
-		for (int i = 0; i < size(City_Wok) - 2; i++) {
-			distance_1 = distance;
-			distance = sqrt(pow(City_Wok[Pop[k].policies[i + 1]].city_x - City_Wok[Pop[k].policies[i]].city_x, 2) + pow(City_Wok[Pop[k].policies[i++]].city_y - City_Wok[Pop[i].policies[i]].city_y, 2)) + distance;
-			assert(distance != distance_1); //LR_7
-											//cout << distance << endl;		
-		}
-		Pop[k].fitness = distance;
-		cout << Pop[k].fitness << endl;
-		assert(distance >= num_cities); //LR_8
-		assert(Pop[k].fitness != 0); //MR_2 & MR_3
-	}
-	for (int x = 0; x < size(Pop); x++) {
-		for (int y = 0; y < size(City_Wok); y++) {
-			for (int z = y + 1; z < size(City_Wok); z++) {
-				assert(Pop[x].policies[y] != Pop[x].policies[z]); //LR_6
-			}
-		}
-	}
-	return Pop;
-}
-
-vector<Policies> EA_Downselect(vector<Policies> Pop) { //Binary Tournament - Take 
+vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournament - Take 
 													   // take the fitness of one policy and compare it to another fitness of another policy at random.
 													   // whichever one has the lower fitness gets put into a new vector until size(population/2)
 	vector<Policies> Pop_new;
-	for (int i = 0; i < size(Pop) / 2; i++) {
+	for (int i = 0; i < size(population) / 2; i++) {
 		int R;
 		int S;
-		R = rand() % (size(Pop) - 1);
-		S = rand() % (size(Pop) - 1);
-		if (Pop[R].fitness < Pop[S].fitness) {
-			Pop_new.push_back(Pop[R]);
+		R = rand() % (size(population) - 1);
+		S = rand() % (size(population) - 1);
+		if (population[R].fitness < population[S].fitness) {
+			Pop_new.push_back(population[R]);
 		}
 		else {
-			Pop_new.push_back(Pop[S]);
+			Pop_new.push_back(population[S]);
 		}
 	}
-	assert(size(Pop_new) == size(Pop) / 2); //MR_4
+	assert(size(Pop_new) == size(population) / 2); //MR_4
 											//return that new vector
 
 	return Pop_new;
@@ -322,27 +281,35 @@ int main()
 	srand(time(NULL));
 
 	//Evolutionary EA;
+	int num_weights = 0;
 	
 	/// SET UP NEURAL NETWORK ///
 	neural_network NN;
-	vector<double> vi;
-	vector<double> weights; 
-	NN.setup(1, 5, 1); ///1 input, 5 hidden, 1 output (Bias units hidden from user)
+	//vector<double> vi;
+	 
+	NN.setup(3, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
 
-	NN.set_in_min_max(0.0, 5.0); /// limits of input for normalization
-	NN.set_out_min_max(-5.0, 30.0); /// limits of outputs for normalization
-	NN.set_vector_input(vi); /// vector of inputs
+	/// FOR X-VALUES
+	NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
+	/// FOR Y-VALUES
+	NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
+	/// FOR THETA
+	NN.set_in_min_max(0.0, 6.28);
+	/// FOR U
+	NN.set_out_min_max(-15.0, 15.0); /// limits of outputs for normalization
 
+	//NN.set_vector_input(vi); /// vector of inputs
+	num_weights = NN.get_number_of_weights();
 
 	/// DEFINE STARTING POSITION AND GOAL POSITION ///
 	boat B;
-	B.Init(); 
+	B.Init();
 
 	/// INITIALIZE POLICIES ///
 	vector<Policies> population;
 	for (int p = 0; p < pop_size; p++) {
 		Policies A;
-		A.init_policy(NN.get_number_of_weights());
+		A.init_policy(num_weights);
 		population.push_back(A);
 	}
 	assert(population.size() == pop_size);
@@ -354,20 +321,20 @@ int main()
 	fout << "Coordinates of Boat for each time step" << "\n";
 
 	for (int g = 0; g < MAX_GENERATIONS; g++)	{
-		//for (int n = 0; n < EA.weights.size(); n++) {
-		for (int s = 0; s < 15; s++) {
+		
+		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
 			NN.set_weights(population.at(s).weights, true);
 			
-			B.Simulation(fout,s,population);
+			B.Simulation(fout,s,population,population.at(s).fitness);
 
 		}	
 		// UPDATE EA WITH FITNESS
-		// EA - DOWNSELECT WITH GIVEN FITNESS
-		//population = EA_downselect();
-		// EA - MUTATE and repopulate WEIGHTS
-		//population = EA_replicate();
 		
+		/// EA - MUTATE and repopulate WEIGHTS
+		population = EA_Replicate(population, num_weights);
+		/// EA - DOWNSELECT WITH GIVEN FITNESS
+		population = EA_Downselect(population);
 	}
 	fout.close();
 
