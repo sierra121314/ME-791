@@ -27,8 +27,8 @@ neural_network NN;
 
 int boundary_x_low = 0;
 int boundary_y_low = 0;
-int boundary_x_high = 100;
-int boundary_y_high = 100;
+int boundary_x_high = 1000;
+int boundary_y_high = 1000;
 
 ////////////////////////////////////////////////////////////////////////////
 ///////////////////////////   Policies  ////////////////////////////////////
@@ -75,6 +75,7 @@ public:
 	double start_boat_y;
 	double starting_theta;
 	double starting_w;
+	double beta;
 	double v = 3; //velocity //set//
 	double w = 0; //angular velocity
 	double dt = 0.2; //time step //set//
@@ -83,6 +84,7 @@ public:
 	double u = 0;
 	void Init();
 	void Simulation(ofstream& fout, int s, vector<Policies> population, double fitness);
+	void find_beta(); //thanks Bryant
 	
 	//Evolutionary EA;
 };
@@ -91,10 +93,11 @@ void boat::Init() { //pass in NN and EA
 	/// STARTING POSITION OF BOAT ///
 	//start_boat_x = rand() % boundary_x_high;
 	//start_boat_y = rand() % boundary_y_high;
-	start_boat_x = 6;
-	start_boat_y = 2;
+	start_boat_x = 600;
+	start_boat_y = 200;
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
+	beta = 0;
 
 	/// ORIENTATION OF AGENT ///
 	double theta_deg = rand() % 360; ///random degree orientation
@@ -112,10 +115,10 @@ void boat::Init() { //pass in NN and EA
 	//goal_y1 = rand() % (boundary_y_high-2);
 	//goal_x2 = goal_x1;
 	//goal_y2 = goal_y1 - 2;
-	goal_x1 = 10; //testing
-	goal_y1 = 1; //testing
-	goal_x2 = 10; //testing
-	goal_y2 = 3; //testing
+	goal_x1 = 100; //testing
+	goal_y1 = 10; //testing
+	goal_x2 = 100; //testing
+	goal_y2 = 30; //testing
 
 }
 
@@ -130,6 +133,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	double distance;
 	double distance_x;
 	double distance_y;
+	double stray;
 	
 	// INITIALIZE STARTING POSITIONS //
 	boat_x = start_boat_x;
@@ -138,9 +142,13 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	//cout << boat_x << "," << boat_y << endl;
 	theta = starting_theta;
 	distance = 0;
+	/// CALCULATE THE STRAY FROM THE GOAL ///
+	find_beta();
+	stray = beta - theta;
 
+	cout << "before time step loop" << endl;
 	for (int i = 0; i < 1000; i++) {
-
+		cout << "inside time step loop" << endl;
 		// Get input vector for NN - x,y,w,theta
 		vector<double> state;
 		state.push_back(boat_x);
@@ -154,20 +162,25 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		/// GET VALUE OF U FROM NN
 		NN.execute();
 		//cout << "poop" << endl;
-		u = NN.get_output(0);
-		//cout << "u" << u << endl;
-
+		u = NN.get_output(0)* PI / 180;
+		cout << "u" << u << endl;
+		
 		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
 		boat_y1 = boat_y + v*sin(theta)*dt;
 		theta = theta + w*dt; 
+		if (theta > (2 * PI)) {
+			theta = theta - 2 * PI;
+		}
+		else if (theta < (-2 * PI)) {
+			theta = theta + 2 * PI;
+		}
 		w = w + (u - w)*dt / T; 
 		
 		/// CALCULATIONS FOR INTERCEPT ///
 		m = (boat_y1 - boat_y) / (boat_x1 - boat_x); ///slope
 		b = boat_y1 - m*boat_x1; /// y intercept
 		y = m*goal_x1+b; ///equation of a line
-
 
 		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
 			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
@@ -185,20 +198,32 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 				}
 			}
 		}
-		//cout << "boat not close to goal" << endl;
+		
+		cout << "boat not close to goal" << endl;
+
+
 
 		/// UPDATE NEW X,Y, VALUES ///
 		boat_x = boat_x1; ///setting the new x value
 		boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
+		cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
+
+		/// CALCULATE THE STRAY FROM THE GOAL ///
+		find_beta();
+		stray = beta - theta;
 
 		/// CALCULATE DISTANCE TO GOAL /// 
 		distance_x = pow(goal_x1 - boat_x, 2);
 		distance_y = pow(goal_y1 - boat_y, 2);
 		//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
 		distance = distance + sqrt(distance_x + distance_y);
-
+		
 		/// CONDITIONS TO QUIT THE LOOP ////
+		assert(boat_x > boundary_x_low);
+		assert(boat_y > boundary_y_low);
+		assert(boat_x < boundary_x_high);
+		assert(boat_y < boundary_y_high);
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high){
 			distance = distance + 10000;
 			break;
@@ -207,7 +232,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		
 
 		/// CALCULATIONS FOR TIME FOR FITNESS //
-		time = dt*i;
+		//time =1; //just for now
 		
 	} //for loop
 
@@ -215,11 +240,20 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
-	fitness = distance*time; //overall distance it took to get to the goal
+	fitness = distance; //overall distance it took to get to the goal
 	//cout << "fitness" << fitness << endl;
 	//population[s].fitness = fabs(fitness);
 }
 
+void boat::find_beta() {
+	//beta = atan((boat_y1 - ((goal_y1 - goal_y2) / 2)) / (boat_x1 - goal_x1));
+	if (boat_x > goal_x1) {
+		beta += 180;
+	}
+	else if (boat_x<goal_x1 && boat_y >((goal_y1 + goal_y2) / 2)) {
+		beta += 360;
+	}
+}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
