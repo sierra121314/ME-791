@@ -81,7 +81,7 @@ public:
 	double dt = 0.2; //time step //set//
 	double theta; //radians
 	double T = 5.0; //set//
-	double u = 0;
+	double u;
 	void Init();
 	void Simulation(ofstream& fout, int s, vector<Policies> population, double fitness);
 	void find_beta(); //thanks Bryant
@@ -98,7 +98,7 @@ void boat::Init() { //pass in NN and EA
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
 	beta = 0;
-
+	u = 0;
 	/// ORIENTATION OF AGENT ///
 	double theta_deg = rand() % 360; ///random degree orientation
 	starting_theta = theta_deg * PI / 180; /// converts degrees to radians
@@ -145,16 +145,22 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	/// CALCULATE THE STRAY FROM THE GOAL ///
 	find_beta();
 	stray = beta - theta;
+	if (stray < 0) {
+		stray += 2 * PI;
+	}
+	else if (stray > PI) {
+		stray = 2 * PI - stray;
+	}
 
 	//cout << "before time step loop" << endl;
 	for (int i = 0; i < 1000; i++) {
 		//cout << "inside time step loop" << endl;
 		// Get input vector for NN - x,y,w,theta
 		vector<double> state;
-		state.push_back(cos(stray));
+		//state.push_back(cos(stray));
 		state.push_back(sin(stray));
-		//state.push_back(boat_x);
-		//state.push_back(boat_y);
+		state.push_back(boat_x);
+		state.push_back(boat_y);
 		//state.push_back(theta);
 		NN.set_vector_input(state);
 		//Give to NN
@@ -177,7 +183,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		else if (theta < (-2 * PI)) {
 			theta = theta + 2 * PI;
 		}
-		w = w + (u - w)*dt / T; 
+		w = w + ((u - w)*dt) / T; 
 		
 		/// CALCULATIONS FOR INTERCEPT ///
 		m = (boat_y1 - boat_y) / (boat_x1 - boat_x); ///slope
@@ -206,14 +212,21 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 
 
 		/// UPDATE NEW X,Y, VALUES ///
-		//boat_x = boat_x1; ///setting the new x value
-		//boat_y = boat_y1; ///setting the new y value
+		boat_x = boat_x1; ///setting the new x value
+		boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 		cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
 		/// CALCULATE THE STRAY FROM THE GOAL ///
 		find_beta();
 		stray = beta - theta;
+		if (stray < 0) {
+			stray += 2*PI;
+		}
+		else if (stray > PI) {
+			stray = 2 * PI - stray;
+		}
+
 
 		/// CALCULATE DISTANCE TO GOAL /// 
 		distance_x = pow(goal_x1 - boat_x, 2);
@@ -248,7 +261,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 }
 
 void boat::find_beta() {
-	//beta = atan((boat_y1 - ((goal_y1 - goal_y2) / 2)) / (boat_x1 - goal_x1));
+	beta = atan((boat_y - ((goal_y1 - goal_y2) / 2)) / (boat_x - goal_x1));
 	if (boat_x > goal_x1) {
 		beta += 180;
 	}
@@ -316,7 +329,7 @@ int main()
 {
 	
 	int MAX_GENERATIONS = 5;
-	int pop_size = 100;
+	int pop_size = 10;
 	srand(time(NULL));
 
 	//Evolutionary EA;
@@ -324,16 +337,16 @@ int main()
 	
 	/// SET UP NEURAL NETWORK ///
 	 
-	NN.setup(2, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
+	NN.setup(3, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
 
 	//for stray
 	NN.set_in_min_max(-1.2,1.2);
-	NN.set_in_min_max(-1.2, 1.2);
+	//NN.set_in_min_max(-1.2, 1.2);
 
 	/// FOR X-VALUES
-	//NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
+	NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
 	/// FOR Y-VALUES
-	//NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
+	NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
 	/// FOR THETA
 	//NN.set_in_min_max(0.0, 6.28);
 	/// FOR U
