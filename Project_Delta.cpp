@@ -146,14 +146,16 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	find_beta();
 	stray = beta - theta;
 
-	cout << "before time step loop" << endl;
+	//cout << "before time step loop" << endl;
 	for (int i = 0; i < 1000; i++) {
-		cout << "inside time step loop" << endl;
+		//cout << "inside time step loop" << endl;
 		// Get input vector for NN - x,y,w,theta
 		vector<double> state;
-		state.push_back(boat_x);
-		state.push_back(boat_y);
-		state.push_back(theta);
+		state.push_back(cos(stray));
+		state.push_back(sin(stray));
+		//state.push_back(boat_x);
+		//state.push_back(boat_y);
+		//state.push_back(theta);
 		NN.set_vector_input(state);
 		//Give to NN
 		
@@ -199,13 +201,13 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 			}
 		}
 		
-		cout << "boat not close to goal" << endl;
+		//cout << "boat not close to goal" << endl;
 
 
 
 		/// UPDATE NEW X,Y, VALUES ///
-		boat_x = boat_x1; ///setting the new x value
-		boat_y = boat_y1; ///setting the new y value
+		//boat_x = boat_x1; ///setting the new x value
+		//boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 		cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
@@ -322,14 +324,18 @@ int main()
 	
 	/// SET UP NEURAL NETWORK ///
 	 
-	NN.setup(3, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
+	NN.setup(2, 5, 1); ///3 input, 5 hidden, 1 output (Bias units hidden from user)
+
+	//for stray
+	NN.set_in_min_max(-1.2,1.2);
+	NN.set_in_min_max(-1.2, 1.2);
 
 	/// FOR X-VALUES
-	NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
+	//NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
 	/// FOR Y-VALUES
-	NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
+	//NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
 	/// FOR THETA
-	NN.set_in_min_max(0.0, 6.28);
+	//NN.set_in_min_max(0.0, 6.28);
 	/// FOR U
 	NN.set_out_min_max(-15.0, 15.0); /// limits of outputs for normalization
 
