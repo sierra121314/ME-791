@@ -79,7 +79,7 @@ public:
 	double T = 5.0; //set//
 	double u;
 	void Init();
-	void Simulation(ofstream& fout, int s, vector<Policies> population, double fitness);
+	void Simulation(ofstream& fout, int s, vector<Policies> population, double *fitness);
 	void find_beta(); //thanks Bryant
 
 					  //Evolutionary EA;
@@ -118,7 +118,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double fitness) {
+void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double *fitness) {
 	//pass in weights
 	double y;
 	double m;
@@ -130,6 +130,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	double distance_x;
 	double distance_y;
 	double stray;
+	double min_distance;
 
 	// INITIALIZE STARTING POSITIONS //
 	boat_x = start_boat_x;
@@ -138,6 +139,12 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	//cout << boat_x << "," << boat_y << endl;
 	theta = starting_theta;
 	distance = 0;
+	/// CALCULATE Minimum Max-DISTANCE TO GOAL /// 
+	distance_x = pow(goal_x1 - boat_x, 2);
+	distance_y = pow(goal_y1 - boat_y, 2);
+	//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
+	min_distance = sqrt(distance_x + distance_y);
+	
 	/// CALCULATE THE STRAY FROM THE GOAL ///
 	find_beta();
 	stray = beta - theta;
@@ -190,6 +197,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
 					distance = distance - 10;
+					cout << "FOUND GOAL\t";
 					break;
 				}
 			}
@@ -198,6 +206,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
 					distance = distance - 10;
+					cout << "FOUND GOAL\t";
 					break;
 				}
 			}
@@ -228,12 +237,16 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		distance_x = pow(goal_x1 - boat_x, 2);
 		distance_y = pow(goal_y1 - boat_y, 2);
 		//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
-		distance = distance + sqrt(distance_x + distance_y);
+		distance = sqrt(distance_x + distance_y);
+		if (distance < min_distance) {
+			min_distance = distance;
+		}
 
 		/// CONDITIONS TO QUIT THE LOOP ////
 		
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
-			distance = distance + 10000;
+			min_distance += 10000;
+			cout << "OUTSIDE\t";
 			break;
 		}
 		assert(boat_x > boundary_x_low);
@@ -252,7 +265,8 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	//cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
-	fitness = distance; //overall distance it took to get to the goal
+	*fitness = min_distance; //overall distance it took to get to the goal
+	cout << *fitness << endl;
 						//cout << "fitness" << fitness << endl;
 						//population[s].fitness = fabs(fitness);
 }
@@ -309,7 +323,7 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 															  // whichever one has the lower fitness gets put into a new vector until size(population/2)
 	vector<Policies> Pop_new;
 	int num = population.size();
-	cout << num << ") ";
+	//cout << num << ") ";
 	for (int i = 0; i < num / 2; i++) {
 		int R;
 		int S;
@@ -321,9 +335,9 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		else {
 			Pop_new.push_back(population[S]);
 		}
-		cout << Pop_new.size() << " ";
+		//cout << Pop_new.size() << " ";
 	}
-	cout << endl;
+	//cout << endl;
 	assert(Pop_new.size() == population.size() / 2); //MR_4
 												   //return that new vector
 
@@ -336,7 +350,7 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 int main()
 {
 
-	int MAX_GENERATIONS = 15;
+	int MAX_GENERATIONS = 150;
 	int pop_size = 10;
 	srand(time(NULL));
 
@@ -385,12 +399,13 @@ int main()
 	for (int g = 0; g < MAX_GENERATIONS; g++) {
 		//cout << population.size() << endl;
 		fout << "GEN" << g << "  ";
+		cout << "GEN" << g << endl;
 		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
-			cout << population.size() << endl;
+			//cout << population.size() << endl;
 			NN.set_weights(population.at(s).weights, true);
 
-			B.Simulation(fout, s, population, population.at(s).fitness);
+			B.Simulation(fout, s, population, &(population.at(s).fitness));
 			//cout << num_weights << endl;
 			
 
