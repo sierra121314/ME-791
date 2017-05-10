@@ -24,6 +24,7 @@
 using namespace std;
 neural_network NN;
 #define PI 3.1415
+#define LYRAND (double)rand()/RAND_MAX
 
 int boundary_x_low = 0;
 int boundary_y_low = 0;
@@ -279,20 +280,20 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 	// Mutate the doubled policies slightly
 	int R;
 	int O;
-	int S;
-	int temp;
+	
+
+	int n = num_weights/4; //number of mutations
+		
 	vector<Policies> Gen;
 	Gen = population; //Copies the old population 
-	for (int i = 0; i < size(population); i++) {
-		R = rand() % (size(population) - 1);
-		O = rand() % ((num_weights) - 2) + 1;
-		S = rand() % ((num_weights) - 2) + 1;
-		while (O == S) {
-			S = rand() % (num_weights - 2) + 1;
-		}
-		temp = population[R].weights[O];
-		population[R].weights[O] = population[R].weights[S];
-		population[R].weights[S] = temp;
+	for (int i = 0; i < size(population)/2; i++) {
+		R = rand() % (size(population));
+		for (int x; x < n; n++) {
+			O = rand() % num_weights;
+			population[R].weights[O] = population[R].weights[O] + LYRAND / 10 - LYRAND / 10;
+			
+		}	
+		
 		Gen.push_back(population[R]);
 		//assert(Gen[R].weights != Pop[R].weights); //LR_4
 	}
