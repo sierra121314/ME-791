@@ -132,6 +132,8 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	double stray;
 	double min_distance;
 
+	fitness = -1;
+
 	// INITIALIZE STARTING POSITIONS //
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
@@ -313,10 +315,12 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 			else if (population.at(R).weights.at(O) < -1) {
 				population.at(R).weights.at(O) = -1; //keeps weights within 1 and -1
 			}
+			//cout << "Poptry\t" << population.at(R).weights.at(O) << endl;
 		}
 
 		Gen.push_back(population.at(R));
 		//assert(Gen[R].weights != Pop[R].weights); //LR_4
+		
 	}
 	return Gen;
 }
@@ -333,16 +337,18 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		int S;
 		R = rand() % num;
 		S = rand() % (num);
-		while (R == S) {
+		//cout << "R\t" << R << endl;
+		while (R == S) { //to make sure R and S aren't the same
 			S = rand() % num;
 		}
+		//cout << "S\t" << S << endl;
 		if (population.at(R).fitness < population.at(S).fitness) {
 			Pop_new.push_back(population.at(R));
-			//cout << population[R].fitness << endl;
+			cout << population.at(R).fitness << endl;
 		}
 		else {
 			Pop_new.push_back(population.at(S));
-			//cout << population[S].fitness << endl;
+			cout << population.at(S).fitness << endl;
 		}
 		//cout << Pop_new.size() << " ";
 	}
@@ -409,6 +415,7 @@ int main()
 		//cout << population.size() << endl;
 		fout << "GEN" << g << "  ";
 		cout << "GEN" << g << endl;
+		
 		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
 			//cout << population.size() << endl;
@@ -416,17 +423,17 @@ int main()
 
 			B.Simulation(fout, s, population, (population.at(s).fitness));
 			//cout << num_weights << endl;
-			
 
 			// UPDATE EA WITH FITNESS
-			/// EA - DOWNSELECT WITH GIVEN FITNESS
-			population = EA_Downselect(population);
-			/// EA - MUTATE and repopulate WEIGHTS
-			population = EA_Replicate(population, num_weights);
 			
 			
 			
 		}
+		/// EA - DOWNSELECT WITH GIVEN FITNESS
+		population = EA_Downselect(population);
+		/// EA - MUTATE and repopulate WEIGHTS
+		population = EA_Replicate(population, num_weights);
+
 
 	}
 	fout.close();
