@@ -304,16 +304,16 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 		for (int x = 0; x < n; x++) {
 			O = rand() % num_weights;
 			
-			population[R].weights[O] = population[R].weights[O] + LYRAND / 10 - LYRAND / 10;
-			if (population[R].weights[O] > 1) {
-				population[R].weights[O] = 1;
+			population.at(R).weights.at(O) = population.at(R).weights.at(O) + LYRAND / 10 - LYRAND / 10;
+			if (population.at(R).weights.at(O) > 1) {
+				population.at(R).weights.at(O) = 1;
 			}
-			else if (population[R].weights[O] < -1) {
-				population[R].weights[O] = -1; //keeps weights within 1 and -1
+			else if (population.at(R).weights.at(O) < -1) {
+				population.at(R).weights.at(O) = -1; //keeps weights within 1 and -1
 			}
 		}
 
-		Gen.push_back(population[R]);
+		Gen.push_back(population.at(R));
 		//assert(Gen[R].weights != Pop[R].weights); //LR_4
 	}
 	return Gen;
@@ -331,12 +331,12 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		int S;
 		R = rand() % num;
 		S = rand() % (num);
-		if (population[R].fitness < population[S].fitness) {
-			Pop_new.push_back(population[R]);
+		if (population.at(R).fitness < population.at(S).fitness) {
+			Pop_new.push_back(population.at(R));
 			//cout << population[R].fitness << endl;
 		}
 		else {
-			Pop_new.push_back(population[S]);
+			Pop_new.push_back(population.at(S));
 			//cout << population[S].fitness << endl;
 		}
 		//cout << Pop_new.size() << " ";
