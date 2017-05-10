@@ -168,7 +168,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		NN.execute();
 		//cout << "poop" << endl;
 		u = NN.get_output(0)* PI / 180;
-		cout << "u" << u << endl;
+		//cout << "u" << u << endl;
 
 		/// CALCULATE X,Y,THETA,W ///
 		boat_x1 = boat_x + v*cos(theta)*dt;
@@ -212,7 +212,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		boat_x = boat_x1; ///setting the new x value
 		boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
-		cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
+		//cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
 		/// CALCULATE THE STRAY FROM THE GOAL ///
 		find_beta();
@@ -249,7 +249,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	} //for loop
 
 	  ////////// EXITING COORDINATES ////////
-	cout << s << "\t" << boat_x << ',' << boat_y << endl;
+	//cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	fitness = distance; //overall distance it took to get to the goal
@@ -276,15 +276,16 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 	// Mutate the doubled policies slightly
 	int R;
 	int O;
-
+	int num = population.size();
 
 	int n = num_weights / 4; //number of mutations
 
 	vector<Policies> Gen;
 	Gen = population; //Copies the old population 
-	for (int i = 0; i < (size(population) / 2); i++) {
+	
+	for (int i = 0; i < num ; i++) {
 		R = rand() % (size(population));
-		for (int x = 0; x < n; n++) {
+		for (int x = 0; x < n; x++) {
 			O = rand() % num_weights;
 			population[R].weights[O] = population[R].weights[O] + LYRAND / 10 - LYRAND / 10;
 
@@ -301,19 +302,23 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 															  // take the fitness of one policy and compare it to another fitness of another policy at random.
 															  // whichever one has the lower fitness gets put into a new vector until size(population/2)
 	vector<Policies> Pop_new;
-	for (int i = 0; i < size(population) / 2; i++) {
+	int num = population.size();
+	cout << num << ") ";
+	for (int i = 0; i < num / 2; i++) {
 		int R;
 		int S;
-		R = rand() % (size(population) - 1);
-		S = rand() % (size(population) - 1);
+		R = rand() % num;
+		S = rand() % (num);
 		if (population[R].fitness < population[S].fitness) {
 			Pop_new.push_back(population[R]);
 		}
 		else {
 			Pop_new.push_back(population[S]);
 		}
+		cout << Pop_new.size() << " ";
 	}
-	assert(size(Pop_new) == size(population) / 2); //MR_4
+	cout << endl;
+	assert(Pop_new.size() == population.size() / 2); //MR_4
 												   //return that new vector
 
 	return Pop_new;
@@ -372,7 +377,8 @@ int main()
 	fout << "Coordinates of Boat for each time step" << "\n";
 
 	for (int g = 0; g < MAX_GENERATIONS; g++) {
-
+		//cout << population.size() << endl;
+		fout << "GEN" << g << "  ";
 		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
 			cout << population.size() << endl;
@@ -380,14 +386,16 @@ int main()
 
 			B.Simulation(fout, s, population, population.at(s).fitness);
 			//cout << num_weights << endl;
+			
 
 			// UPDATE EA WITH FITNESS
 
 			/// EA - MUTATE and repopulate WEIGHTS
 			population = EA_Replicate(population, num_weights);
+			
 			/// EA - DOWNSELECT WITH GIVEN FITNESS
 			population = EA_Downselect(population);
-			cout << "pop size" << population.size() << endl;
+			
 		}
 
 	}
