@@ -79,7 +79,7 @@ public:
 	double T = 5.0; //set//
 	double u;
 	void Init();
-	void Simulation(ofstream& fout, int s, vector<Policies> population, double& fitness);
+	double Simulation(ofstream& fout);
 	void find_beta(); //thanks Bryant
 
 					  //Evolutionary EA;
@@ -118,7 +118,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double& fitness) {
+double boat::Simulation(ofstream &fout) {
 	//pass in weights
 	double y;
 	double m;
@@ -131,22 +131,25 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	double distance_y;
 	double stray;
 	double min_distance;
+	double start_goal_distance=0;
+	double sum_distance;
+	double fitness = 0;
 
-	fitness = -1;
-
-	// INITIALIZE STARTING POSITIONS //
+	/// INITIALIZE STARTING POSITIONS //
 	boat_x = start_boat_x;
 	boat_y = start_boat_y;
 	w = starting_w;
 	//cout << boat_x << "," << boat_y << endl;
 	theta = starting_theta;
 	distance = 0;
+	sum_distance = 0;
 	/// CALCULATE Minimum Max-DISTANCE TO GOAL /// 
 	distance_x = pow(goal_x1 - boat_x, 2);
 	distance_y = pow(goal_y1 - boat_y, 2);
 	//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
-	min_distance = sqrt(distance_x + distance_y);
-	
+	start_goal_distance = sqrt(distance_x + distance_y);
+	min_distance = start_goal_distance;
+
 	/// CALCULATE THE STRAY FROM THE GOAL ///
 	find_beta();
 	stray = beta - theta;
@@ -198,9 +201,9 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
 			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					distance = distance - 10;
+					sum_distance = distance - 10*(1000*i);
 					cout << "FOUND GOAL\t";
-					min_distance = distance;
+					
 					break;
 				}
 			}
@@ -208,9 +211,9 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		else {		//If x2 is to the left of x1
 			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					distance = distance - 10;
+					sum_distance = distance - 10*(1000*i);
 					cout << "FOUND GOAL\t";
-					min_distance = distance;
+					
 					break;
 				}
 			}
@@ -218,38 +221,16 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 
 		//cout << "boat not close to goal" << endl;
 
-
-
 		/// UPDATE NEW X,Y, VALUES ///
 		boat_x = boat_x1; ///setting the new x value
 		boat_y = boat_y1; ///setting the new y value
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 		//cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
-		/// CALCULATE THE STRAY FROM THE GOAL ///
-		find_beta();
-		stray = beta - theta;
-		if (stray < 0) {
-			stray += 2 * PI;
-		}
-		else if (stray > PI) {
-			stray = 2 * PI - stray;
-		}
-
-
-		/// CALCULATE DISTANCE TO GOAL /// 
-		distance_x = pow(goal_x1 - boat_x, 2);
-		distance_y = pow(goal_y1 - boat_y, 2);
-		//cout << "d_x   " << distance_x << '\t' << "d_y   " << distance_y << endl;
-		distance = sqrt(distance_x + distance_y);
-		if (distance < min_distance) {
-			min_distance = distance;
-		}
-
-		/// CONDITIONS TO QUIT THE LOOP ////
 		
+		/// CONDITIONS TO QUIT THE LOOP ////
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
-			min_distance += 10000;
+			sum_distance += distance + 10000 * (1000 * i);
 			cout << "OUTSIDE\t";
 			break;
 		}
@@ -258,10 +239,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		assert(boat_x < boundary_x_high);
 		assert(boat_y < boundary_y_high);
 		//cout << "boat within boundary" << endl;
-
-
-		/// CALCULATIONS FOR TIME FOR FITNESS //
-		//time =1; //just for now
+	
 
 	} //for loop
 
@@ -269,9 +247,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	//cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
-	fitness = min_distance; //overall distance it took to get to the goal
-
-
+	return fitness = sum_distance; //overall distance it took to get to the goal
 	cout << fitness << endl;
 						//cout << "fitness" << fitness << endl;
 						//population[s].fitness = fabs(fitness);
@@ -421,7 +397,7 @@ int main()
 			//cout << population.size() << endl;
 			NN.set_weights(population.at(s).weights, true);
 
-			B.Simulation(fout, s, population, (population.at(s).fitness));
+			population.at(s).fitness = B.Simulation(fout);
 			//cout << num_weights << endl;
 
 			// UPDATE EA WITH FITNESS
