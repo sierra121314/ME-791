@@ -49,10 +49,9 @@ public:
 void Policies::init_policy(int num_weights) {
 	for (int p = 0; p < num_weights; p++) {
 		//cout << "Order " << p << endl;
-		weights.push_back(p);
+		weights.push_back(LYRAND * 2 - 1);
 	}
-	//By shuffling only after the first city, we ensure we start in the same place each time
-	random_shuffle(weights.begin(), weights.end());
+	
 	
 }
 
@@ -232,14 +231,15 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 		distance = distance + sqrt(distance_x + distance_y);
 
 		/// CONDITIONS TO QUIT THE LOOP ////
-		assert(boat_x > boundary_x_low);
-		assert(boat_y > boundary_y_low);
-		assert(boat_x < boundary_x_high);
-		assert(boat_y < boundary_y_high);
+		
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
 			distance = distance + 10000;
 			break;
 		}
+		assert(boat_x > boundary_x_low);
+		assert(boat_y > boundary_y_low);
+		assert(boat_x < boundary_x_high);
+		assert(boat_y < boundary_y_high);
 		//cout << "boat within boundary" << endl;
 
 
@@ -287,8 +287,14 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 		R = rand() % (size(population));
 		for (int x = 0; x < n; x++) {
 			O = rand() % num_weights;
+			
 			population[R].weights[O] = population[R].weights[O] + LYRAND / 10 - LYRAND / 10;
-
+			if (population[R].weights[O] > 1) {
+				population[R].weights[O] = 1;
+			}
+			else if (population[R].weights[O] < -1) {
+				population[R].weights[O] = -1; //keeps weights within 1 and -1
+			}
 		}
 
 		Gen.push_back(population[R]);
