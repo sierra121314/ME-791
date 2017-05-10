@@ -79,7 +79,7 @@ public:
 	double T = 5.0; //set//
 	double u;
 	void Init();
-	void Simulation(ofstream& fout, int s, vector<Policies> population, double *fitness);
+	void Simulation(ofstream& fout, int s, vector<Policies> population, double& fitness);
 	void find_beta(); //thanks Bryant
 
 					  //Evolutionary EA;
@@ -118,7 +118,7 @@ void boat::Init() { //pass in NN and EA
 
 }
 
-void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double *fitness) {
+void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double& fitness) {
 	//pass in weights
 	double y;
 	double m;
@@ -265,10 +265,10 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	//cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
-	*fitness = min_distance; //overall distance it took to get to the goal
+	fitness = min_distance; //overall distance it took to get to the goal
 
 
-	cout << *fitness << endl;
+	cout << fitness << endl;
 						//cout << "fitness" << fitness << endl;
 						//population[s].fitness = fabs(fitness);
 }
@@ -276,10 +276,10 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 void boat::find_beta() {
 	beta = atan((boat_y - ((goal_y1 - goal_y2) / 2)) / (boat_x - goal_x1));
 	if (boat_x > goal_x1) {
-		beta += 180;
+		beta += PI;
 	}
 	else if (boat_x<goal_x1 && boat_y >((goal_y1 + goal_y2) / 2)) {
-		beta += 360;
+		beta += 2*PI;
 	}
 }
 
@@ -409,7 +409,7 @@ int main()
 			//cout << population.size() << endl;
 			NN.set_weights(population.at(s).weights, true);
 
-			B.Simulation(fout, s, population, &(population.at(s).fitness));
+			B.Simulation(fout, s, population, (population.at(s).fitness));
 			//cout << num_weights << endl;
 			
 
