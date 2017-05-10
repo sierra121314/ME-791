@@ -198,6 +198,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 				if (y >= goal_y1 && y <= goal_y2) {
 					distance = distance - 10;
 					cout << "FOUND GOAL\t";
+					min_distance = distance;
 					break;
 				}
 			}
@@ -207,6 +208,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 				if (y >= goal_y1 && y <= goal_y2) {
 					distance = distance - 10;
 					cout << "FOUND GOAL\t";
+					min_distance = distance;
 					break;
 				}
 			}
@@ -300,7 +302,7 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 	Gen = population; //Copies the old population 
 	
 	for (int i = 0; i < num ; i++) {
-		R = rand() % (size(population));
+		R = rand() % (population.size());
 		for (int x = 0; x < n; x++) {
 			O = rand() % num_weights;
 			
@@ -331,6 +333,9 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		int S;
 		R = rand() % num;
 		S = rand() % (num);
+		while (R == S) {
+			S = rand() % num;
+		}
 		if (population.at(R).fitness < population.at(S).fitness) {
 			Pop_new.push_back(population.at(R));
 			//cout << population[R].fitness << endl;
@@ -414,12 +419,12 @@ int main()
 			
 
 			// UPDATE EA WITH FITNESS
-
+			/// EA - DOWNSELECT WITH GIVEN FITNESS
+			population = EA_Downselect(population);
 			/// EA - MUTATE and repopulate WEIGHTS
 			population = EA_Replicate(population, num_weights);
 			
-			/// EA - DOWNSELECT WITH GIVEN FITNESS
-			population = EA_Downselect(population);
+			
 			
 		}
 
