@@ -266,6 +266,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	*fitness = min_distance; //overall distance it took to get to the goal
+
 	cout << *fitness << endl;
 						//cout << "fitness" << fitness << endl;
 						//population[s].fitness = fabs(fitness);
@@ -331,16 +332,18 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		S = rand() % (num);
 		if (population[R].fitness < population[S].fitness) {
 			Pop_new.push_back(population[R]);
+			//cout << population[R].fitness << endl;
 		}
 		else {
 			Pop_new.push_back(population[S]);
+			//cout << population[S].fitness << endl;
 		}
 		//cout << Pop_new.size() << " ";
 	}
 	//cout << endl;
 	assert(Pop_new.size() == population.size() / 2); //MR_4
 												   //return that new vector
-
+	
 	return Pop_new;
 }
 
