@@ -267,6 +267,7 @@ void boat::Simulation(ofstream &fout, int s, vector<Policies> population, double
 	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	*fitness = min_distance; //overall distance it took to get to the goal
 
+
 	cout << *fitness << endl;
 						//cout << "fitness" << fitness << endl;
 						//population[s].fitness = fabs(fitness);
