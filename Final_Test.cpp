@@ -320,11 +320,11 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 		//cout << "S\t" << S << endl;
 		if (population.at(R).fitness < population.at(S).fitness) {
 			Pop_new.push_back(population.at(R));
-			cout << population.at(R).fitness << endl;
+			//cout << population.at(R).fitness << endl;
 		}
 		else {
 			Pop_new.push_back(population.at(S));
-			cout << population.at(S).fitness << endl;
+			//cout << population.at(S).fitness << endl;
 		}
 		//cout << Pop_new.size() << " ";
 	}
@@ -342,7 +342,7 @@ int main()
 {
 
 	int MAX_GENERATIONS = 150;
-	int pop_size = 10;
+	int pop_size = 20;
 	srand(time(NULL));
 
 	//Evolutionary EA;
