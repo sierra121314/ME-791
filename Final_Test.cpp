@@ -51,8 +51,8 @@ void Policies::init_policy(int num_weights) {
 		//cout << "Order " << p << endl;
 		weights.push_back(LYRAND * 2 - 1);
 	}
-	
-	
+
+
 }
 
 
@@ -131,7 +131,7 @@ double boat::Simulation(ofstream &fout) {
 	double distance_y;
 	double stray;
 	double min_distance;
-	double start_goal_distance=0;
+	double start_goal_distance = 0;
 	double sum_distance;
 	double fitness = 0;
 
@@ -201,9 +201,9 @@ double boat::Simulation(ofstream &fout) {
 		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
 			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					sum_distance = distance - 10*(1000-i);
+					sum_distance = distance - 10 * (1000 - i);
 					cout << "FOUND GOAL\t";
-					
+
 					break;
 				}
 			}
@@ -211,9 +211,9 @@ double boat::Simulation(ofstream &fout) {
 		else {		//If x2 is to the left of x1
 			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					sum_distance = distance - 10*(1000-i);
+					sum_distance = distance - 10 * (1000 - i);
 					cout << "FOUND GOAL\t";
-					
+
 					break;
 				}
 			}
@@ -227,7 +227,7 @@ double boat::Simulation(ofstream &fout) {
 		fout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 		//cout << boat_x << ',' << boat_y << ',' << theta << ',' << w << endl;
 
-		
+
 		/// CONDITIONS TO QUIT THE LOOP ////
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
 			sum_distance += distance + 10000 * (1000 - i);
@@ -239,18 +239,18 @@ double boat::Simulation(ofstream &fout) {
 		assert(boat_x < boundary_x_high);
 		assert(boat_y < boundary_y_high);
 		//cout << "boat within boundary" << endl;
-	
+
 
 	} //for loop
 
 	  ////////// EXITING COORDINATES ////////
-	//cout << s << "\t" << boat_x << ',' << boat_y << endl;
+	  //cout << s << "\t" << boat_x << ',' << boat_y << endl;
 
-	/// CALCULATE THE FITNESS - uses distance and time // MR_4 //
+	  /// CALCULATE THE FITNESS - uses distance and time // MR_4 //
 	return fitness = sum_distance; //overall distance it took to get to the goal
 	cout << fitness << endl;
-						//cout << "fitness" << fitness << endl;
-						//population[s].fitness = fabs(fitness);
+	//cout << "fitness" << fitness << endl;
+	//population[s].fitness = fabs(fitness);
 }
 
 void boat::find_beta() {
@@ -259,7 +259,7 @@ void boat::find_beta() {
 		beta += PI;
 	}
 	else if (boat_x<goal_x1 && boat_y >((goal_y1 + goal_y2) / 2)) {
-		beta += 2*PI;
+		beta += 2 * PI;
 	}
 }
 
@@ -278,12 +278,12 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 
 	vector<Policies> Gen;
 	Gen = population; //Copies the old population 
-	
-	for (int i = 0; i < num ; i++) {
+
+	for (int i = 0; i < num; i++) {
 		R = rand() % (population.size());
 		for (int x = 0; x < n; x++) {
 			O = rand() % num_weights;
-			
+
 			population.at(R).weights.at(O) = population.at(R).weights.at(O) + LYRAND / 10 - LYRAND / 10;
 			if (population.at(R).weights.at(O) > 1) {
 				population.at(R).weights.at(O) = 1;
@@ -296,7 +296,7 @@ vector<Policies> EA_Replicate(vector<Policies> population, int num_weights) {
 
 		Gen.push_back(population.at(R));
 		//assert(Gen[R].weights != Pop[R].weights); //LR_4
-		
+
 	}
 	return Gen;
 }
@@ -330,8 +330,8 @@ vector<Policies> EA_Downselect(vector<Policies> population) { //Binary Tournamen
 	}
 	//cout << endl;
 	assert(Pop_new.size() == population.size() / 2); //MR_4
-												   //return that new vector
-	
+													 //return that new vector
+
 	return Pop_new;
 }
 
@@ -358,14 +358,14 @@ int main()
 
 	/// FOR X-VALUES
 	NN.set_in_min_max(0.0, boundary_x_high); /// limits of input for normalization
-	/// FOR Y-VALUES
+											 /// FOR Y-VALUES
 	NN.set_in_min_max(0.0, boundary_y_high); /// limits of input for normalization
-	 /// FOR THETA
-	//NN.set_in_min_max(0.0, 6.28);
+											 /// FOR THETA
+											 //NN.set_in_min_max(0.0, 6.28);
 											 /// FOR U
 	NN.set_out_min_max(-15.0, 15.0); /// limits of outputs for normalization
 
-	//NN.set_vector_input(vi); /// vector of inputs
+									 //NN.set_vector_input(vi); /// vector of inputs
 	num_weights = NN.get_number_of_weights();
 
 	/// DEFINE STARTING POSITION AND GOAL POSITION ///
@@ -391,7 +391,7 @@ int main()
 		//cout << population.size() << endl;
 		fout << "GEN" << g << "  ";
 		cout << "GEN" << g << endl;
-		
+
 		for (int s = 0; s < population.size(); s++) {
 			fout << "Sim" << s << "\n";
 			//cout << population.size() << endl;
@@ -401,9 +401,9 @@ int main()
 			//cout << num_weights << endl;
 
 			// UPDATE EA WITH FITNESS
-			
-			
-			
+
+
+
 		}
 		/// EA - DOWNSELECT WITH GIVEN FITNESS
 		population = EA_Downselect(population);
@@ -424,4 +424,3 @@ int main()
 	cin >> input;
 	return 0;
 }
-
