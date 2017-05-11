@@ -201,7 +201,7 @@ double boat::Simulation(ofstream &fout) {
 		if (boat_x1 < boat_x) {		//If x1 is to the left of x2
 			if (boat_x1 <= goal_x1 && boat_x >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					sum_distance = distance - 10*(1000*i);
+					sum_distance = distance - 10*(1000-i);
 					cout << "FOUND GOAL\t";
 					
 					break;
@@ -211,7 +211,7 @@ double boat::Simulation(ofstream &fout) {
 		else {		//If x2 is to the left of x1
 			if (boat_x <= goal_x1 && boat_x1 >= goal_x2) {	//If they are on either side of the goal
 				if (y >= goal_y1 && y <= goal_y2) {
-					sum_distance = distance - 10*(1000*i);
+					sum_distance = distance - 10*(1000-i);
 					cout << "FOUND GOAL\t";
 					
 					break;
@@ -230,7 +230,7 @@ double boat::Simulation(ofstream &fout) {
 		
 		/// CONDITIONS TO QUIT THE LOOP ////
 		if (boat_x < boundary_x_low || boat_x > boundary_x_high || boat_y < boundary_y_low || boat_y > boundary_y_high) {
-			sum_distance += distance + 10000 * (1000 * i);
+			sum_distance += distance + 10000 * (1000 - i);
 			cout << "OUTSIDE\t";
 			break;
 		}
